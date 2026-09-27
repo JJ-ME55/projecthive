@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>$HIVE</title>
+<meta name="description" content="$HIVE buys identity.md AI-agent seats with its trading fees, runs them, and pays the IMD they earn to stakers.">
+<meta property="og:title" content="$HIVE">
+<meta property="og:description" content="Own a share of the AI workforce. $HIVE buys identity.md agents and pays stakers what they earn.">
+<link rel="icon" type="image/png" href="hive-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#3a7043; --muted:#5f7e66; --faint:#9db3a2;
+  --line:#3a7043; --soft:#d8e4db; --surface:#ffffff; --surface-2:#f1f7f2; --hover:#e9f2eb;
+  --grad-a:#2c5e37; --grad-b:#7faa88;
+  --s1:#3a7043; --s2:#5f8b68; --s3:#89ab90; --s4:#b4ccb9;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-size:14px; line-height:1.62; -webkit-font-smoothing:antialiased; font-variant-ligatures:none;}
+h1,h2,h3{margin:0; font-weight:400; letter-spacing:-.01em; line-height:1.14; text-wrap:balance}
+a{color:var(--ink); text-decoration:none}
+b,strong{font-weight:600}
+.mono,.tnum{font-variant-numeric:tabular-nums}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:20px}
+.eyebrow{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); font-weight:500}
+section{border-top:1px solid var(--soft)}
+.pad{padding-block:clamp(44px,7vw,76px)}
+
+/* nav */
+nav{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--bg); border-bottom:1px solid var(--line)}
+.nav-in{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:10px}
+.brand{display:flex; align-items:center; gap:10px; border:1px solid var(--line); padding:7px 12px; font-weight:500; letter-spacing:.12em; font-size:14px}
+.brand .mark{height:24px;width:auto;display:block}
+.nav-in .sp{flex:1}
+.nlink{color:var(--muted); font-size:12px; letter-spacing:.06em; text-transform:uppercase; padding:8px 6px}
+.nlink:hover{color:var(--ink)}
+.nbtn{border:1px solid var(--line); padding:8px 14px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; font-weight:500; cursor:pointer; background:var(--bg); color:var(--ink)}
+.nbtn.solid{background:var(--ink); color:var(--bg)}
+.nbtn:hover{background:var(--hover)} .nbtn.solid:hover{opacity:.85; background:var(--ink)}
+@media (max-width:680px){ .nlink{display:none} }
+
+/* hero */
+.hero{position:relative; overflow:hidden}
+.hero .grid-bg{position:absolute; inset:0; background-image:linear-gradient(var(--soft) 1px,transparent 1px),linear-gradient(90deg,var(--soft) 1px,transparent 1px); background-size:44px 44px; -webkit-mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent 75%); mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent 75%); opacity:.6; pointer-events:none}
+.hero .in{position:relative; padding-block:clamp(48px,9vw,92px)}
+.tick{display:inline-flex; align-items:center; gap:9px; border:1px solid var(--line); padding:6px 12px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+.tick .b{width:7px;height:7px;background:var(--ink)}
+.hero h1{font-size:clamp(34px,7vw,62px); font-weight:500; margin:22px 0 0; max-width:16ch; letter-spacing:-.03em}
+.hero .lead{max-width:62ch; margin:22px 0 0; color:var(--muted); font-size:clamp(14px,1.9vw,16px)}
+.hero .lead b{color:var(--ink); font-weight:600}
+.ctas{display:flex; gap:12px; flex-wrap:wrap; margin-top:30px}
+.btn{display:inline-flex; align-items:center; gap:9px; border:1px solid var(--line); padding:13px 20px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; font-weight:500}
+.btn.solid{background:var(--ink); color:var(--bg)}
+.btn.solid:hover{opacity:.85} .btn:hover{background:var(--hover)}
+.cabar{margin-top:28px; border:1px solid var(--line); display:flex; align-items:stretch; max-width:560px; font-size:12px}
+.cabar .k{background:var(--surface-2); border-right:1px solid var(--line); padding:12px 14px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap; display:flex; align-items:center}
+.cabar .v{padding:12px 14px; color:var(--muted); display:flex; align-items:center}
+
+/* section head */
+.sh{margin-bottom:26px}
+.sh h2{font-size:clamp(22px,3.6vw,32px); font-weight:500; letter-spacing:-.02em}
+.sh p{color:var(--muted); font-size:14px; max-width:60ch; margin:12px 0 0}
+
+/* flow — numbered list */
+.flow{list-style:none; margin:0; padding:0; border:1px solid var(--line)}
+.flow li{display:flex; gap:18px; padding:18px 22px; border-bottom:1px solid var(--soft); align-items:baseline}
+.flow li:last-child{border-bottom:0}
+.flow .fn{font-weight:600; color:var(--faint); min-width:1.4em; font-variant-numeric:tabular-nums; font-size:15px}
+.flow .tx{color:var(--muted); font-size:14.5px}
+.flow .tx b{color:var(--ink); font-weight:600}
+.loopnote{margin-top:16px; font-size:13px; color:var(--muted)}
+.loopnote b{color:var(--ink)}
+
+/* wedge */
+.wedge{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line)}
+.wcell{padding:28px}
+.wcell:first-child{border-right:1px solid var(--line)}
+.wcell .tag{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.wcell h3{font-size:20px; font-weight:500; margin:12px 0 12px}
+.wcell p{margin:0; color:var(--muted); font-size:14px}
+.wcell.us{background:var(--ink); color:var(--bg)}
+.wcell.us .tag,.wcell.us p{color:color-mix(in srgb,var(--bg) 72%,var(--ink))}
+.wcell.us h3,.wcell.us b{color:var(--bg)}
+@media (max-width:600px){ .wedge{grid-template-columns:1fr} .wcell:first-child{border-right:0; border-bottom:1px solid var(--line)} }
+
+/* maths — fee split */
+.split{border:1px solid var(--line); padding:24px}
+.split-top{display:flex; align-items:baseline; justify-content:space-between; gap:16px}
+.split-top .lbl{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.split-top .pct{font-size:clamp(30px,5vw,44px); font-weight:500; letter-spacing:-.03em}
+.bar{display:flex; height:16px; margin:18px 0 16px; border:1px solid var(--line)}
+.bar i{display:block; height:100%}
+.bar i:nth-child(1){background:var(--s1)} .bar i:nth-child(2){background:var(--s2)} .bar i:nth-child(3){background:var(--s3)} .bar i:nth-child(4){background:var(--s4)}
+.legend{display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin:0; padding:0; list-style:none}
+.legend li{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--muted)}
+.legend b{color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums}
+.legend .sw{width:12px;height:12px;flex:none}
+.legend .sw1{background:var(--s1)} .legend .sw2{background:var(--s2)} .legend .sw3{background:var(--s3)} .legend .sw4{background:var(--s4)}
+@media (max-width:520px){ .legend{grid-template-columns:1fr} }
+
+.facts{display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line); border-top:0; margin-top:0}
+.fact{padding:22px 24px; border-right:1px solid var(--line)}
+.fact:last-child{border-right:0}
+.fact .big{font-size:32px; font-weight:500; letter-spacing:-.03em}
+.fact .lbl{margin-top:8px; font-size:13px; color:var(--muted); line-height:1.5}
+@media (max-width:640px){ .facts{grid-template-columns:1fr} .fact{border-right:0; border-bottom:1px solid var(--line)} .fact:last-child{border-bottom:0} }
+.note-line{margin-top:20px; font-size:13px; color:var(--muted); border-left:2px solid var(--ink); padding-left:14px; max-width:70ch}
+.note-line b{color:var(--ink)}
+
+/* trustless */
+.trust-grid{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line)}
+.tcell{padding:22px; display:flex; gap:14px; border-right:1px solid var(--line); border-bottom:1px solid var(--line)}
+.tcell:nth-child(2n){border-right:0}
+.tcell:nth-last-child(-n+2){border-bottom:0}
+.tcell svg{width:22px;height:22px;flex:none;stroke:var(--ink)}
+.tcell b{display:block; font-size:14px; font-weight:600}
+.tcell span{font-size:12.5px; color:var(--muted); line-height:1.5}
+@media (max-width:600px){ .trust-grid{grid-template-columns:1fr} .tcell{border-right:0} .tcell:nth-last-child(2){border-bottom:1px solid var(--line)} }
+
+.bobnod{display:flex; align-items:center; gap:16px; border:1px solid var(--soft); padding:12px 16px; margin-bottom:24px}
+.bobnod .face{width:50px;height:50px;flex:none;border:1px solid var(--line);overflow:hidden;background:#eef1e5;display:block}
+.bobnod .face img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
+.bobnod .tx{color:var(--muted); font-size:13px}
+.bobnod .tx b{color:var(--ink)}
+
+footer{border-top:1px solid var(--line); padding-block:30px; color:var(--muted); font-size:12px}
+footer .r{display:flex; gap:20px; flex-wrap:wrap; align-items:center}
+footer a{color:var(--muted)} footer a:hover{color:var(--ink)}
+footer .sp{flex:1}
+footer .fine{margin-top:18px; font-size:11.5px; line-height:1.6; max-width:780px; color:var(--faint)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/">
+      <img class="mark" src="hive-logo.png" alt="" aria-hidden="true">HIVE
+    </a>
+    <span class="sp"></span>
+    <a class="nlink" href="#how">How it works</a>
+    <a class="nlink" href="#maths">The maths</a>
+    <a class="nbtn" href="/dashboard.html">Dashboard</a>
+    <a class="nbtn solid" href="/stake.html">Stake</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="grid-bg"></div>
+  <div class="wrap in">
+    <span class="tick"><span class="b"></span> Own the AI workforce</span>
+    <h1>Own a share of the AI workforce.</h1>
+    <p class="lead">identity.md is a swarm of <b>2,000 AI agents</b> that earn <b>$IMD</b> for their work. $HIVE buys those agents with its trading fees, runs them, and pays what they earn to everyone who stakes $HIVE. One agent costs thousands. A share costs whatever you put in.</p>
+    <div class="ctas">
+      <a class="btn solid" href="/dashboard.html">Dashboard</a>
+      <a class="btn" href="#how">How it works</a>
+    </div>
+    <div class="cabar"><span class="k">Contract</span><span class="v">Address goes live at launch on Pons.</span></div>
+  </div>
+</header>
+
+<section id="how" class="pad">
+  <div class="wrap">
+    <div class="sh"><h2>How it works</h2></div>
+    <ol class="flow">
+      <li><span class="fn">1</span><span class="tx"><b>Trade.</b> Every buy and sell pays a 6.5% fee.</span></li>
+      <li><span class="fn">2</span><span class="tx"><b>Buy seats.</b> Fees buy identity.md seats, cheapest first, price-capped.</span></li>
+      <li><span class="fn">3</span><span class="tx"><b>Run them.</b> Each seat runs as an AI agent and earns IMD.</span></li>
+      <li><span class="fn">4</span><span class="tx"><b>Pay stakers.</b> Stakers claim the IMD the seats earn, pro-rata to their stake.</span></li>
+      <li><span class="fn">5</span><span class="tx"><b>Compound.</b> A share of earnings buys the next seat.</span></li>
+    </ol>
+    <p class="loopnote">Hold $HIVE to earn. Stake it and a loyalty multiplier grows your share from <b>1× to 2×</b> over 90 days.</p>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="sh"><h2>Work, don't flip</h2></div>
+    <div class="wedge">
+      <div class="wcell">
+        <span class="tag">The other guys</span>
+        <h3>Buy and flip</h3>
+        <p>Other strategy tokens buy the same seats and relist them for a markup. They ignore what the seats are for: earning IMD when you run them.</p>
+      </div>
+      <div class="wcell us">
+        <span class="tag">$HIVE</span>
+        <h3>Buy and work</h3>
+        <p>$HIVE holds the seats, registers them as AI agents, and runs them. The IMD they earn goes to stakers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="maths" class="pad">
+  <div class="wrap">
+    <div class="sh"><h2>The maths</h2></div>
+    <div class="split">
+      <div class="split-top"><span class="lbl">Every trade pays</span><span class="pct tnum">6.5%</span></div>
+      <div class="bar"><i style="width:84.6%"></i><i style="width:7.7%"></i><i style="width:3.1%"></i><i style="width:4.6%"></i></div>
+      <ul class="legend">
+        <li><span class="sw sw1"></span><b>5.5%</b>&nbsp; buys AI agents</li>
+        <li><span class="sw sw2"></span><b>0.5%</b>&nbsp; team</li>
+        <li><span class="sw sw3"></span><b>0.2%</b>&nbsp; running costs</li>
+        <li><span class="sw sw4"></span><b>0.3%</b>&nbsp; Pons launchpad</li>
+      </ul>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="big tnum">2,000</div><div class="lbl">seats in the swarm. Fixed supply.</div></div>
+      <div class="fact"><div class="big tnum" id="seat-floor">~$7,000</div><div class="lbl" id="seat-floor-sub">to buy one seat outright.</div></div>
+      <div class="fact"><div class="big tnum">100%</div><div class="lbl">of the IMD those seats earn goes to stakers.</div></div>
+    </div>
+    <p class="note-line">Seat earnings are small today. $HIVE is <b>NFT-backed ownership of a working AI fleet, not a guaranteed yield</b>.</p>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="sh"><h2>Trustless</h2></div>
+    <div class="trust-grid">
+      <div class="tcell"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><div><b>No admin keys</b><span>The contracts have fixed rules and no owner. Deployed once, they cannot be changed.</span></div></div>
+      <div class="tcell"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg><div><b>Public ledger</b><span>Every seat the protocol owns is on-chain, with its earnings, for anyone to check.</span></div></div>
+      <div class="tcell"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Price-capped buying</b><span>The buyer contract will not pay above a hard ceiling for a seat.</span></div></div>
+      <div class="tcell"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><div><b>2-of-3 multisig</b><span>Seats and reserves sit behind a Safe signed by the founders and an outside party.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="bobnod">
+      <span class="face"><img src="bob-wave.jpg" alt="Bob" loading="lazy"></span>
+      <span class="tx"><b>Be like Bob.</b> Can't afford a seat? Hold $HIVE and earn from the whole swarm.</span>
+    </div>
+    <div class="r">
+      <a class="brand" href="/" style="font-size:13px;padding:6px 10px">
+        <img src="hive-logo.png" alt="" aria-hidden="true" style="height:17px;width:auto;display:block">HIVE
+      </a>
+      <span class="sp"></span>
+      <a href="/dashboard.html">Dashboard</a><a href="#how">How it works</a><a href="#maths">The maths</a>
+    </div>
+    <p class="fine">$HIVE turns trading fees into income-producing identity.md agent seats and pays stakers the IMD those seats earn. Not affiliated with identity.md or the IMD team. Not investment advice and not a promise of returns. Seat earnings depend on real demand for the swarm's work. DYOR.</p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener("click",function(e){ var el=document.querySelector(a.getAttribute("href")); if(el){ e.preventDefault(); el.scrollIntoView({behavior:"smooth"}); } }); });
+
+  // live identity.md floor (OpenSea via /api/floor) — falls back to the static figure if unset
+  (async function(){
+    var big=document.getElementById("seat-floor"), sub=document.getElementById("seat-floor-sub");
+    if(!big) return;
+    var ethUsd=0;
+    try{ var p=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd").then(function(r){return r.json();}); ethUsd=(p&&p.ethereum&&p.ethereum.usd)||0; }catch(e){}
+    try{
+      var f=await fetch("/api/floor").then(function(r){return r.json();});
+      if(f&&f.ok&&f.floorEth){
+        var eth=Number(f.floorEth);
+        big.textContent = ethUsd ? "~$"+Math.round(eth*ethUsd).toLocaleString("en-US") : eth.toFixed(2)+" ETH";
+        if(sub) sub.textContent = "live floor · "+eth.toFixed(2)+" ETH on OpenSea";
+      }
+    }catch(e){}
+  })();
+</script>
+</body>
+</html>

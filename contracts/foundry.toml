@@ -1,0 +1,23 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+solc = "0.8.26"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 800
+fs_permissions = [{ access = "read", path = "./" }]
+remappings = [
+  "forge-std/=lib/forge-std/src/",
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+]
+
+[profile.default.fuzz]
+runs = 64
+
+# The SeatBuyer fork test forks Ethereum mainnet; it skips unless ETH_FORK_RPC is set.
+[rpc_endpoints]
+ethereum = "https://eth.drpc.org"
+robinhood = "https://rpc.mainnet.chain.robinhood.com"

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stake $HIVE</title>
+<link rel="icon" type="image/png" href="hive-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#3a7043; --muted:#5f7e66; --faint:#9db3a2;
+  --line:#3a7043; --soft:#d8e4db; --surface:#ffffff; --surface-2:#f1f7f2; --hover:#e9f2eb;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased; font-variant-ligatures:none;}
+.tnum{font-variant-numeric:tabular-nums}
+h1,h2{margin:0; font-weight:500; letter-spacing:-.01em}
+a{color:var(--ink);text-decoration:none}
+.wrap{max-width:720px; margin:0 auto; padding-inline:16px; padding-block:20px 56px}
+.back{display:inline-block; margin-bottom:14px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.back:hover{color:var(--ink)}
+
+.top{display:flex; align-items:center; gap:12px; border:1px solid var(--line); padding:12px 14px; margin-bottom:16px}
+.top .logo{width:auto;height:28px;flex:none;display:block}
+.top h1{font-size:15px; font-weight:500; letter-spacing:.12em; text-transform:uppercase}
+.top .sp{flex:1}
+.wbtn{border:1px solid var(--line); background:var(--ink); color:var(--bg); font-family:inherit; font-size:11px; letter-spacing:.06em; text-transform:uppercase; padding:9px 13px; cursor:pointer}
+.wbtn.ghost{background:var(--bg); color:var(--ink)}
+.wbtn:hover{opacity:.88}
+
+.banner{border:1px solid var(--line); background:var(--surface-2); padding:12px 14px; margin-bottom:16px; font-size:12.5px; color:var(--muted); display:none}
+.banner b{color:var(--ink)}
+.banner.show{display:block}
+
+.pos{display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line); margin-bottom:16px}
+.pc{padding:16px; border-right:1px solid var(--line)}
+.pc:last-child{border-right:0}
+.pc .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.pc .v{font-weight:500; font-size:22px; margin-top:7px; overflow-wrap:anywhere}
+.pc .s{font-size:11px; color:var(--muted); margin-top:4px; min-height:14px}
+@media (max-width:560px){ .pos{grid-template-columns:1fr} .pc{border-right:0;border-bottom:1px solid var(--line)} .pc:last-child{border-bottom:0} }
+
+.card{border:1px solid var(--line); margin-bottom:14px}
+.card .h{display:flex; align-items:baseline; justify-content:space-between; padding:12px 15px; border-bottom:1px solid var(--soft)}
+.card .h h2{font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase}
+.card .h .bal{font-size:11.5px; color:var(--muted)}
+.card .b{padding:15px}
+.field{display:flex; border:1px solid var(--line)}
+.field input{flex:1; min-width:0; font-family:inherit; font-size:16px; background:transparent; border:0; color:var(--ink); padding:13px 14px}
+.field input:focus{outline:0; background:var(--surface-2)}
+.field .max{border:0; border-left:1px solid var(--soft); background:var(--bg); color:var(--muted); font-family:inherit; font-size:11px; letter-spacing:.08em; text-transform:uppercase; padding:0 14px; cursor:pointer}
+.field .max:hover{color:var(--ink)}
+.act{width:100%; margin-top:12px; border:1px solid var(--line); background:var(--ink); color:var(--bg); font-family:inherit; font-size:13px; letter-spacing:.06em; text-transform:uppercase; padding:14px; cursor:pointer}
+.act.ghost{background:var(--bg); color:var(--ink)}
+.act:hover{opacity:.88}
+.act:disabled{opacity:.4; cursor:not-allowed}
+.claimrow{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px}
+.claimrow .amt{font-size:22px; font-weight:500}
+.claimrow .amt small{font-size:.5em;color:var(--muted)}
+
+.status{min-height:20px; font-size:12px; color:var(--muted); margin-top:6px; word-break:break-word}
+.status a{color:var(--ink);text-decoration:underline}
+.note{margin-top:20px; font-size:11.5px; color:var(--muted); line-height:1.6; border-top:1px solid var(--soft); padding-top:14px}
+.tiers{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; font-size:11px; color:var(--muted)}
+.tiers span{border:1px solid var(--soft); padding:4px 8px}
+.tiers span.on{border-color:var(--line); color:var(--ink); font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← $HIVE</a>
+
+  <div class="top">
+    <img class="logo" src="hive-logo.png" alt="" aria-hidden="true">
+    <div><h1>Stake</h1></div>
+    <div class="sp"></div>
+    <button class="wbtn" id="connect">Connect wallet</button>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="pos">
+    <div class="pc"><span class="k">Your stake</span><div class="v tnum" id="p-staked">—</div><div class="s">$HIVE</div></div>
+    <div class="pc"><span class="k">Loyalty</span><div class="v tnum" id="p-mult">—</div><div class="s" id="p-mult-s">multiplier</div></div>
+    <div class="pc"><span class="k">Claimable</span><div class="v tnum" id="p-claim">—</div><div class="s">IMD</div></div>
+  </div>
+  <div class="tiers" id="tiers">
+    <span data-t="0">1.00× now</span><span data-t="7">1.25× · 7d</span><span data-t="30">1.50× · 30d</span><span data-t="90">2.00× · 90d</span>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="h"><h2>Stake</h2><span class="bal">Wallet: <b class="tnum" id="bal">—</b> $HIVE</span></div>
+    <div class="b">
+      <div class="field"><input id="stake-amt" inputmode="decimal" placeholder="0.0"><button class="max" id="stake-max">Max</button></div>
+      <button class="act" id="stake-btn" disabled>Connect wallet</button>
+      <div class="status" id="stake-status"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="h"><h2>Unstake</h2><span class="bal">Staked: <b class="tnum" id="staked2">—</b> $HIVE</span></div>
+    <div class="b">
+      <div class="field"><input id="unstake-amt" inputmode="decimal" placeholder="0.0"><button class="max" id="unstake-max">Max</button></div>
+      <button class="act ghost" id="unstake-btn" disabled>Connect wallet</button>
+      <div class="status" id="unstake-status"></div>
+      <p class="note" style="margin-top:12px;border:0;padding:0">Unstaking returns your $HIVE and drops that portion's weight. What you leave staked keeps its loyalty clock.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="h"><h2>Claim IMD</h2></div>
+    <div class="claimrow">
+      <div class="amt tnum"><span id="claim-amt">—</span> <small>IMD</small></div>
+      <button class="act ghost" id="claim-btn" style="width:auto;margin:0" disabled>Claim</button>
+    </div>
+    <div class="status" id="claim-status" style="padding:0 15px 14px"></div>
+  </div>
+
+  <p class="note" id="note">Stake $HIVE, earn the IMD the seats produce. Your loyalty multiplier rises from 1.00× to 2.00× the longer you stay staked; it locks in a new tier whenever you stake, claim, or unstake. On Robinhood Chain. No admin keys — the contract can never take your stake.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script>
+const CFG = {
+  hiveStaking: "",  // Robinhood HiveStaking — set at launch
+  hiveToken:   "",  // Robinhood $HIVE — set at launch
+  chainId: 4663, chainHex: "0x1237",
+  rpc: "https://rpc.mainnet.chain.robinhood.com",
+  explorer: "https://robinhoodchain.blockscout.com",
+  chainName: "Robinhood Chain"
+};
+const STAKING_ABI = [
+  "function stake(uint256 amount)",
+  "function unstake(uint256 amount)",
+  "function claim() returns (uint256)",
+  "function stakeOf(address) view returns (uint256 amount,uint256 since,uint256 weight,uint256 multBps,uint256 claimable)"
+];
+const ERC20_ABI = [
+  "function approve(address spender,uint256 amount) returns (bool)",
+  "function allowance(address owner,address spender) view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
+const $=id=>document.getElementById(id);
+const live = /^0x[0-9a-fA-F]{40}$/.test(CFG.hiveStaking) && /^0x[0-9a-fA-F]{40}$/.test(CFG.hiveToken);
+let provider, signer, account, dec=18, allowance=0n, staked=0n, since=0;
+
+function fmt(x, d){ try{ return Number(ethers.formatUnits(x, d==null?dec:d)).toLocaleString("en-US",{maximumFractionDigits:4}); }catch(e){ return "0"; } }
+function short(a){ return a.slice(0,6)+"…"+a.slice(-4); }
+function tx(u){ return CFG.explorer+"/tx/"+u; }
+
+if(!live){
+  $("banner").className="banner show";
+  $("banner").innerHTML="<b>Staking opens when $HIVE launches.</b> The contract is built and tested; this page goes live the moment it is deployed. Connect to preview.";
+}
+
+async function connect(){
+  if(!window.ethereum){ $("banner").className="banner show"; $("banner").innerHTML="<b>No wallet found.</b> Install Rabby or MetaMask to stake."; return; }
+  provider = new ethers.BrowserProvider(window.ethereum);
+  try{ await provider.send("eth_requestAccounts", []); }catch(e){ return; }
+  // ensure Robinhood Chain
+  const net = await provider.getNetwork();
+  if(Number(net.chainId) !== CFG.chainId){
+    try{ await window.ethereum.request({ method:"wallet_switchEthereumChain", params:[{ chainId: CFG.chainHex }] }); }
+    catch(e){
+      try{ await window.ethereum.request({ method:"wallet_addEthereumChain", params:[{ chainId:CFG.chainHex, chainName:CFG.chainName, nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18}, rpcUrls:[CFG.rpc], blockExplorerUrls:[CFG.explorer] }] }); }
+      catch(e2){ $("stake-status").textContent="Please switch your wallet to Robinhood Chain."; return; }
+    }
+    provider = new ethers.BrowserProvider(window.ethereum);
+  }
+  signer = await provider.getSigner();
+  account = await signer.getAddress();
+  $("connect").textContent = short(account);
+  $("connect").className = "wbtn ghost";
+  window.ethereum.on && window.ethereum.on("accountsChanged", ()=>location.reload());
+  window.ethereum.on && window.ethereum.on("chainChanged", ()=>location.reload());
+  await refresh();
+}
+
+async function refresh(){
+  if(!signer || !live) return;
+  const hive = new ethers.Contract(CFG.hiveToken, ERC20_ABI, signer);
+  const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
+  try{ dec = Number(await hive.decimals()); }catch(e){}
+  const [bal, alw, pos] = await Promise.all([
+    hive.balanceOf(account), hive.allowance(account, CFG.hiveStaking), stk.stakeOf(account)
+  ]);
+  allowance = alw; staked = pos.amount; since = Number(pos.since);
+  const multBps = Number(pos.multBps);
+  $("bal").textContent = fmt(bal); $("staked2").textContent = fmt(staked);
+  $("p-staked").textContent = fmt(staked);
+  $("p-mult").textContent = (multBps/10000).toFixed(2)+"×";
+  $("p-claim").textContent = fmt(pos.claimable); $("claim-amt").textContent = fmt(pos.claimable);
+  // tier highlight
+  const held = since? (Date.now()/1000 - since) : 0, day=86400;
+  document.querySelectorAll("#tiers span").forEach(s=>{ s.classList.toggle("on", held >= Number(s.dataset.t)*day); });
+  if(since){
+    const next = held<7*day?7:held<30*day?30:held<90*day?90:0;
+    $("p-mult-s").textContent = next? Math.ceil(next - held/day)+"d to next tier" : "max loyalty";
+  }
+  $("stake-btn").disabled=false; $("unstake-btn").disabled=false; $("claim-btn").disabled = pos.claimable===0n;
+  updateStakeBtn();
+}
+function updateStakeBtn(){
+  const v = parseAmt($("stake-amt").value);
+  $("stake-btn").textContent = (v>0n && v>allowance) ? "Approve $HIVE" : "Stake";
+}
+function parseAmt(s){ try{ return ethers.parseUnits((s||"0").trim()||"0", dec); }catch(e){ return 0n; } }
+
+async function doStake(){
+  if(!signer){ return connect(); }
+  const v = parseAmt($("stake-amt").value);
+  if(v<=0n){ $("stake-status").textContent="Enter an amount."; return; }
+  const hive = new ethers.Contract(CFG.hiveToken, ERC20_ABI, signer);
+  const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
+  try{
+    if(v>allowance){
+      $("stake-status").textContent="Approving…";
+      const t=await hive.approve(CFG.hiveStaking, ethers.MaxUint256); await t.wait();
+      allowance=ethers.MaxUint256; $("stake-btn").textContent="Stake";
+      $("stake-status").innerHTML='Approved. Now press Stake.'; return;
+    }
+    $("stake-status").textContent="Staking…";
+    const t=await stk.stake(v); $("stake-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait();
+    $("stake-status").textContent="Staked."; $("stake-amt").value=""; await refresh();
+  }catch(e){ $("stake-status").textContent = (e && (e.shortMessage||e.message) || "Failed").slice(0,140); }
+}
+async function doUnstake(){
+  if(!signer){ return connect(); }
+  const v = parseAmt($("unstake-amt").value);
+  if(v<=0n){ $("unstake-status").textContent="Enter an amount."; return; }
+  const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
+  try{ $("unstake-status").textContent="Unstaking…"; const t=await stk.unstake(v); $("unstake-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait(); $("unstake-status").textContent="Unstaked."; $("unstake-amt").value=""; await refresh(); }
+  catch(e){ $("unstake-status").textContent=(e&&(e.shortMessage||e.message)||"Failed").slice(0,140); }
+}
+async function doClaim(){
+  if(!signer){ return connect(); }
+  const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
+  try{ $("claim-status").textContent="Claiming…"; const t=await stk.claim(); $("claim-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait(); $("claim-status").textContent="Claimed."; await refresh(); }
+  catch(e){ $("claim-status").textContent=(e&&(e.shortMessage||e.message)||"Failed").slice(0,140); }
+}
+
+$("connect").onclick=connect;
+$("stake-btn").onclick=doStake;
+$("unstake-btn").onclick=doUnstake;
+$("claim-btn").onclick=doClaim;
+$("stake-amt").addEventListener("input", updateStakeBtn);
+$("stake-max").onclick=async()=>{ if(signer&&live){ const hive=new ethers.Contract(CFG.hiveToken,ERC20_ABI,signer); const b=await hive.balanceOf(account); $("stake-amt").value=ethers.formatUnits(b,dec); updateStakeBtn(); } };
+$("unstake-max").onclick=()=>{ $("unstake-amt").value=ethers.formatUnits(staked,dec); };
+if(!live){ ["stake-btn","unstake-btn","claim-btn"].forEach(id=>{ $(id).textContent="Opens at launch"; }); }
+</script>
+</body>
+</html>

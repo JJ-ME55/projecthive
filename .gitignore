@@ -1,0 +1,17 @@
+# build artifacts
+**/out/
+**/cache/
+**/broadcast/
+**/node_modules/
+
+# secrets & local state (never commit)
+**/.env
+**/.env.*
+!**/.env.example
+.vercel/
+**/.vercel/
+**/data/
+
+# os
+.DS_Store
+Thumbs.db

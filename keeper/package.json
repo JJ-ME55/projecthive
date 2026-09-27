@@ -1,0 +1,24 @@
+{
+  "name": "hive-keeper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-chain keeper for $HIVE: harvest ETH fees on Robinhood Chain, bridge to Ethereum, auto-buy identity.md seats via Seaport, collect seat IMD earnings, bridge back, and top up HiveStaking rewards.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && tsx test/run.ts",
+    "keeper": "tsx src/keeper.ts",
+    "harvest": "tsx -e \"import('./src/harvest.js').then(m=>m.harvestOnce())\"",
+    "quote": "tsx -e \"import('./src/bridge.js').then(m=>m.quoteCli())\"",
+    "listings": "tsx -e \"import('./src/seats.js').then(m=>m.listingsCli())\"",
+    "config": "tsx -e \"import('./src/config.js').then(m=>m.printConfig())\""
+  },
+  "dependencies": {
+    "viem": "^2.21.55"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HIVE Dashboard</title>
+<link rel="icon" type="image/png" href="hive-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --ink:#3a7043; --muted:#5f7e66; --faint:#9db3a2;
+  --line:#3a7043; --soft:#d8e4db; --surface:#ffffff; --surface-2:#f1f7f2; --hover:#e9f2eb;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased; font-variant-ligatures:none;}
+.tnum{font-variant-numeric:tabular-nums}
+h1,h2{margin:0; font-weight:500; letter-spacing:-.01em}
+.wrap{max-width:1000px; margin:0 auto; padding-inline:16px; padding-block:20px 56px}
+.back{display:inline-block; margin-bottom:14px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.back:hover{color:var(--ink)}
+a{color:var(--ink);text-decoration:none}
+
+.top{display:flex; align-items:center; gap:12px; border:1px solid var(--line); padding:12px 14px; margin-bottom:18px}
+.top .logo{width:auto;height:28px;flex:none;display:block}
+.top h1{font-size:15px; font-weight:500; letter-spacing:.12em; text-transform:uppercase}
+.top .sub{font-size:11px; color:var(--muted); letter-spacing:.06em}
+.top .sp{flex:1}
+.pill{display:inline-flex; align-items:center; gap:8px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; padding:6px 11px; border:1px solid var(--line)}
+.pill .dot{width:7px;height:7px;background:var(--faint)}
+.pill.live .dot{background:var(--ink)}
+.pill.live{color:var(--ink)} .pill.idle{color:var(--muted)}
+
+.sec{margin-bottom:18px}
+.sec-h{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px}
+.sec-h h2{font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase}
+.sec-h .tag{font-size:10.5px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase}
+.sec-sub{font-size:12px; color:var(--muted); margin:-4px 0 12px}
+
+/* pot */
+.pot{border:1px solid var(--line); padding:22px}
+.pot .row1{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.pot .amt{font-size:clamp(30px,6vw,46px); font-weight:500; letter-spacing:-.03em}
+.pot .amt small{font-size:.42em; color:var(--muted); font-weight:500; letter-spacing:0}
+.pot .goal{font-size:12px; color:var(--muted); text-align:right}
+.pot .goal b{color:var(--ink); font-weight:600}
+.potbar{height:20px; border:1px solid var(--line); margin:16px 0 10px; background:var(--surface-2); overflow:hidden}
+.potbar i{display:block; height:100%; width:0; background:var(--ink); transition:width .8s ease}
+.pot .pctline{display:flex; justify-content:space-between; font-size:12px; color:var(--muted)}
+.pot .pctline b{color:var(--ink); font-weight:600}
+
+/* tiles */
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line)}
+.tile{padding:15px 16px; border-right:1px solid var(--line); min-width:0}
+.tile:last-child{border-right:0}
+.tile .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.tile .v{font-weight:500; font-size:24px; letter-spacing:-.02em; margin-top:8px; overflow-wrap:anywhere}
+.tile .s{font-size:11px; color:var(--muted); margin-top:4px; min-height:14px}
+@media (max-width:720px){ .tiles{grid-template-columns:1fr 1fr} .tile{border-bottom:1px solid var(--line)} .tile:nth-child(2n){border-right:0} .tile:nth-last-child(-n+2){border-bottom:0} }
+
+/* inactive overlay */
+.gate{position:relative}
+.gate.off .gate-inner{opacity:.35; filter:grayscale(.4); pointer-events:none}
+.gate .gate-msg{display:none}
+.gate.off .gate-msg{display:flex; position:absolute; inset:0; align-items:center; justify-content:center; text-align:center; padding:20px; z-index:2}
+.gate .gate-msg span{border:1px solid var(--line); background:var(--bg); padding:10px 16px; font-size:12px; color:var(--muted); letter-spacing:.04em}
+
+/* compare */
+.cmp{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line)}
+.cmp .col{padding:20px}
+.cmp .col:first-child{border-right:1px solid var(--line)}
+.cmp .col.hive{background:var(--surface-2)}
+.cmp .tag{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+.cmp .big{font-size:28px; font-weight:500; letter-spacing:-.02em; margin-top:10px}
+.cmp .rows{margin-top:14px; border-top:1px solid var(--soft); padding-top:12px}
+.cmp .rr{display:flex; justify-content:space-between; gap:12px; padding:5px 0; font-size:12.5px; color:var(--muted)}
+.cmp .rr b{color:var(--ink); font-weight:600}
+@media (max-width:600px){ .cmp{grid-template-columns:1fr} .cmp .col:first-child{border-right:0; border-bottom:1px solid var(--line)} }
+
+/* checker */
+.check{border:1px solid var(--line)}
+.check .in{display:flex; border-bottom:1px solid var(--line)}
+.check input{flex:1; min-width:0; font-family:inherit; font-size:13px; background:transparent; border:0; color:var(--ink); padding:14px 16px}
+.check input:focus{outline:0; background:var(--surface-2)}
+.check button{border:0; border-left:1px solid var(--line); background:var(--ink); color:var(--bg); font-family:inherit; font-size:12px; letter-spacing:.08em; text-transform:uppercase; padding:0 18px; cursor:pointer}
+.check button:hover{opacity:.88}
+.check .out{display:grid; grid-template-columns:repeat(3,1fr)}
+.check .co{padding:15px 16px; border-right:1px solid var(--soft)}
+.check .co:last-child{border-right:0}
+.check .co .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.check .co .v{font-weight:500; font-size:20px; margin-top:6px}
+@media (max-width:560px){ .check .out{grid-template-columns:1fr} .check .co{border-right:0;border-bottom:1px solid var(--soft)} }
+
+.note{margin-top:22px; font-size:11.5px; color:var(--muted); line-height:1.6; border-top:1px solid var(--soft); padding-top:14px}
+.note code{background:var(--surface-2); border:1px solid var(--soft); padding:1px 5px; font-size:11px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← $HIVE</a>
+
+  <div class="top">
+    <img class="logo" src="hive-logo.png" alt="" aria-hidden="true">
+    <div><h1>The Hive</h1><div class="sub">LIVE TREASURY · ON-CHAIN</div></div>
+    <div class="sp"></div>
+    <a class="pill" href="/stake.html" style="background:var(--ink);color:var(--bg);border-color:var(--ink)">Stake →</a>
+    <span id="status" class="pill idle"><span class="dot"></span><span id="status-txt">Pre-launch</span></span>
+  </div>
+
+  <!-- THE POT -->
+  <section class="sec">
+    <div class="sec-h"><h2>The pot</h2><span class="tag" id="pot-tag">building toward seat #1</span></div>
+    <p class="sec-sub">Trading fees pool here until there's enough to buy the next identity.md seat. Then the Hive buys it, and the pot resets.</p>
+    <div class="pot">
+      <div class="row1">
+        <div class="amt tnum" id="pot-amt">—<small id="pot-amt-usd"></small></div>
+        <div class="goal">Next seat<br><b class="tnum" id="pot-floor">—</b></div>
+      </div>
+      <div class="potbar"><i id="pot-fill"></i></div>
+      <div class="pctline"><span><b class="tnum" id="pot-pct">0%</b> filled</span><span id="pot-remain"></span></div>
+    </div>
+  </section>
+
+  <!-- THE FLEET (gated until first seat) -->
+  <section class="sec gate off" id="fleet">
+    <div class="sec-h"><h2>The fleet</h2><span class="tag">identity.md seats</span></div>
+    <div class="gate-msg"><span id="fleet-msg">Activates when the Hive owns its first seat.</span></div>
+    <div class="gate-inner">
+      <div class="tiles">
+        <div class="tile"><span class="k">Seats owned</span><div class="v tnum" id="f-seats">0</div><div class="s"></div></div>
+        <div class="tile"><span class="k">IMD earned</span><div class="v tnum" id="f-earned">—</div><div class="s" id="f-earned-usd"></div></div>
+        <div class="tile"><span class="k">Per seat / mo</span><div class="v tnum" id="f-perseat">—</div><div class="s">IMD each seat earns</div></div>
+        <div class="tile"><span class="k">Paid to stakers</span><div class="v tnum" id="f-paid">—</div><div class="s">IMD distributed</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE: stake HIVE vs stake IMD -->
+  <section class="sec gate off" id="compare">
+    <div class="sec-h"><h2>Stake HIVE, or stake IMD</h2><span class="tag">same money, more agents</span></div>
+    <div class="gate-msg"><span>Live once staking opens.</span></div>
+    <div class="gate-inner">
+      <div class="cmp">
+        <div class="col hive">
+          <span class="tag">Staked in $HIVE</span>
+          <div class="big tnum" id="c-hive-staked">—</div>
+          <div class="rows">
+            <div class="rr"><span>IMD to stakers</span><b class="tnum" id="c-hive-earn">—</b></div>
+            <div class="rr"><span>Backed by seats</span><b class="tnum" id="c-hive-seats">—</b></div>
+          </div>
+        </div>
+        <div class="col">
+          <span class="tag">Staked in $IMD</span>
+          <div class="big tnum" id="c-imd-staked">—</div>
+          <div class="rows">
+            <div class="rr"><span>IMD to stakers</span><b class="tnum" id="c-imd-earn">—</b></div>
+            <div class="rr"><span>Backed by seats</span><b>none</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WALLET CHECKER -->
+  <section class="sec">
+    <div class="sec-h"><h2>Check a wallet</h2><span class="tag">your position</span></div>
+    <div class="check">
+      <div class="in">
+        <input id="w-addr" spellcheck="false" autocomplete="off" placeholder="0x… your wallet">
+        <button id="w-go">Check</button>
+      </div>
+      <div class="out">
+        <div class="co"><span class="k">$HIVE staked</span><div class="v tnum" id="w-staked">—</div></div>
+        <div class="co"><span class="k">Loyalty</span><div class="v tnum" id="w-mult">—</div></div>
+        <div class="co"><span class="k">IMD claimable</span><div class="v tnum" id="w-pending">—</div></div>
+      </div>
+    </div>
+    <p class="sec-sub" id="w-note" style="margin-top:10px">Staking opens at launch. Paste a wallet to see its position once it's live.</p>
+  </section>
+
+  <p class="note" id="note">Read-only. Seat count and $IMD come from Ethereum; the pot from Robinhood Chain; the seat floor from OpenSea. Nothing here can move funds. The live figures switch on as the Hive deploys and buys its first seat.</p>
+</div>
+
+<script>
+// ------- config (filled at launch; the dashboard reads what's set and switches on) -------
+const CFG = {
+  seatVault:    "",  // Ethereum Safe that holds the seats
+  potWallet:    "",  // Robinhood seat-treasury (ETH pooling toward the next seat)
+  hiveStaking:  "",  // Robinhood HiveStaking
+  hiveToken:    "",  // Robinhood $HIVE
+  imdRobinhood: "",  // bridged IMD on Robinhood
+  identityMd:   "0x0000eC93127BAA929E58E97dd0095A2BFb38ec1D",
+  imdEth:       "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7"
+};
+const ETH_RPCS=["https://ethereum-rpc.publicnode.com","https://eth.llamarpc.com","https://rpc.ankr.com/eth"];
+const RH_RPCS=["https://rpc.mainnet.chain.robinhood.com","https://rpc.ordofi.network"];
+const $=function(id){return document.getElementById(id);};
+const has=a=>/^0x[0-9a-fA-F]{40}$/.test(a||"");
+let ethUsd=0;
+
+const fmt=(n,d)=>{d=d==null?2:d;return Number(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});};
+const usd=n=>ethUsd?("$"+Number(n).toLocaleString("en-US",{maximumFractionDigits:0})):"";
+
+async function rpc(urls,method,params){
+  for(const u of urls){ try{ const r=await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method,params})}); const j=await r.json(); if(j.result!==undefined) return j.result; }catch(e){} }
+  return null;
+}
+const nativeBal=(urls,addr)=>rpc(urls,"eth_getBalance",[addr,"latest"]).then(x=>x?Number(BigInt(x))/1e18:null);
+async function erc(urls,token,addr){ const data="0x70a08231"+addr.toLowerCase().replace(/^0x/,"").padStart(64,"0"); const r=await rpc(urls,"eth_call",[{to:token,data},"latest"]); return r?Number(BigInt(r)):null; }
+
+async function loadPrice(){ try{ const r=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd").then(r=>r.json()); ethUsd=(r&&r.ethereum&&r.ethereum.usd)||0; }catch(e){} }
+
+async function loadFloor(){
+  let floorEth=0;
+  try{ const f=await fetch("/api/floor").then(r=>r.json()); if(f&&f.ok&&f.floorEth) floorEth=Number(f.floorEth); }catch(e){}
+  return floorEth;
+}
+
+async function loadPot(){
+  const floor=await loadFloor();
+  let pot=0;
+  if(has(CFG.potWallet)){ const b=await nativeBal(RH_RPCS,CFG.potWallet); if(b!=null) pot=b; }
+  const floorUsd=floor*ethUsd, potUsd=pot*ethUsd;
+  $("pot-amt").firstChild.nodeValue = has(CFG.potWallet)? fmt(pot,3)+" Ξ" : "—";
+  $("pot-amt-usd").textContent = has(CFG.potWallet)&&ethUsd? "  "+usd(potUsd) : "";
+  $("pot-floor").textContent = floor? fmt(floor,2)+" Ξ"+(ethUsd?"  ~"+usd(floorUsd):"") : "—";
+  const pct = floor? Math.max(0,Math.min(100, pot/floor*100)) : 0;
+  $("pot-fill").style.width = pct+"%";
+  $("pot-pct").textContent = fmt(pct,1)+"%";
+  if(floor && has(CFG.potWallet)){ const rem=Math.max(0,floor-pot); $("pot-remain").textContent = fmt(rem,2)+" Ξ to go"; }
+  else { $("pot-remain").textContent = has(CFG.potWallet)?"":"fills once $HIVE is live"; }
+}
+
+async function loadFleet(){
+  if(!has(CFG.seatVault)) return; // stays gated
+  const seats=await erc(ETH_RPCS,CFG.identityMd,CFG.seatVault);
+  if(seats==null) return;
+  if(seats>0){ $("fleet").classList.remove("off"); $("compare").classList.remove("off"); $("status").className="pill live"; $("status-txt").textContent=seats+" seat"+(seats>1?"s":"")+" live"; }
+  $("f-seats").textContent=seats;
+  // IMD earned by the vault (imd.fun, proxied)
+  try{
+    const r=await fetch("/imd/earnings/"+CFG.seatVault).then(r=>r.json());
+    const list=Array.isArray(r&&r.earnings)?r.earnings:[];
+    let tot=0; list.forEach(e=>{ try{ tot+=Number(BigInt(e.amount||"0"))/Math.pow(10,(e.token&&e.token.decimals)||18); }catch(x){} });
+    $("f-earned").textContent=fmt(tot,1)+" IMD";
+    if(seats>0) $("f-perseat").textContent=fmt(tot/seats,1)+" IMD";
+  }catch(e){}
+}
+
+async function checkWallet(){
+  const a=$("w-addr").value.trim();
+  if(!has(a)){ $("w-note").textContent="Enter a valid 0x wallet address."; return; }
+  if(!has(CFG.hiveStaking)){ $("w-note").textContent="Staking isn't live yet — check back at launch."; return; }
+  $("w-note").textContent="Reading on-chain…";
+  const staked=await erc(RH_RPCS,CFG.hiveStaking,a); // placeholder: stake balance getter wired at launch
+  $("w-staked").textContent = staked!=null? fmt(staked/1e18,0)+" HIVE" : "—";
+  $("w-note").textContent="Loyalty multiplier and claimable IMD load once the staking ABI is wired at launch.";
+}
+
+async function boot(){
+  await loadPrice();
+  await loadPot();
+  await loadFleet();
+  $("w-go").addEventListener("click",checkWallet);
+  $("w-addr").addEventListener("keydown",e=>{ if(e.key==="Enter") checkWallet(); });
+}
+boot();
+</script>
+</body>
+</html>
