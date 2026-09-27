@@ -16,13 +16,14 @@ interface IPonsFeeEscrow {
  *         seats), ops (running costs), and the team. The money goes escrow → splitter → recipients
  *         with no owner, no way to change the percentages, and no personal wallet in the path.
  *
- * Shares are the 5% / 0.2% / 0.5% fee plan expressed against the 5.7% a creator nets on Pons v2
- * (5% tax + 0.7% kickback): 5/5.7, 0.2/5.7, 0.5/5.7.
+ * Shares are the 5.5% / 0.2% / 0.5% fee plan expressed against the 6.2% a creator nets on Pons v2
+ * (5.5% tax + 0.7% kickback): 5.5/6.2, 0.2/6.2, 0.5/6.2. Buyers see 6.5% total (the 5.5% tax plus
+ * Pons's 1% layer, of which Pons keeps 0.3% and kicks 0.7% back, funding the ops + team lines).
  */
 contract HiveSplitter is ReentrancyGuard {
-    uint256 public constant SEAT_BPS = 8772; // ~87.72% -> seat treasury
-    uint256 public constant OPS_BPS = 351; //  ~3.51%  -> ops / running costs
-    uint256 public constant TEAM_BPS = 877; // ~8.77%  -> team
+    uint256 public constant SEAT_BPS = 8871; // ~88.71% -> seat treasury
+    uint256 public constant OPS_BPS = 323; //  ~3.23%  -> ops / running costs
+    uint256 public constant TEAM_BPS = 806; // ~8.06%  -> team
     uint256 public constant BPS = 10_000;
 
     address public immutable seatTreasury;

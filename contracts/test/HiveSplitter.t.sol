@@ -37,24 +37,24 @@ contract HiveSplitterTest is Test {
     function test_splitsByShares() public {
         vm.deal(address(sp), 1 ether);
         sp.distribute();
-        assertEq(seat.balance, (uint256(1 ether) * 8772) / 10000);
-        assertEq(ops.balance, (uint256(1 ether) * 351) / 10000);
+        assertEq(seat.balance, (uint256(1 ether) * 8871) / 10000);
+        assertEq(ops.balance, (uint256(1 ether) * 323) / 10000);
         assertEq(team.balance, 1 ether - seat.balance - ops.balance);
     }
 
     // nothing is lost: seat + ops + team == everything that came in
     function test_conservation() public {
-        vm.deal(address(sp), 5.7 ether);
+        vm.deal(address(sp), 6.2 ether);
         sp.distribute();
-        assertEq(seat.balance + ops.balance + team.balance, 5.7 ether, "all distributed");
+        assertEq(seat.balance + ops.balance + team.balance, 6.2 ether, "all distributed");
         assertEq(address(sp).balance, 0, "nothing left behind");
     }
 
-    // 5.7 ETH claimed (a 5% tax on ~100 ETH volume) lands as ~5 / ~0.2 / ~0.5
+    // 6.2 ETH claimed (a 5.5% tax on ~100 ETH volume) lands as ~5.5 / ~0.2 / ~0.5
     function test_matchesFeePlan() public {
-        vm.deal(address(sp), 5.7 ether);
+        vm.deal(address(sp), 6.2 ether);
         sp.distribute();
-        assertApproxEqRel(seat.balance, 5 ether, 0.002e18); // ~5 ETH to seats
+        assertApproxEqRel(seat.balance, 5.5 ether, 0.002e18); // ~5.5 ETH to seats
         assertApproxEqRel(ops.balance, 0.2 ether, 0.01e18); // ~0.2 ETH ops
         assertApproxEqRel(team.balance, 0.5 ether, 0.01e18); // ~0.5 ETH team
     }
@@ -71,16 +71,16 @@ contract HiveSplitterTest is Test {
 
     // the full on-chain path: fees credited in the escrow -> harvest() claims + splits in one call
     function test_harvestClaimsThenSplits() public {
-        // the launch credits 5.7 ETH of creator fees to the splitter's escrow balance
-        escrow.credit{value: 5.7 ether}(address(sp));
-        assertEq(escrow.balanceOf(address(sp)), 5.7 ether, "credited");
+        // the launch credits 6.2 ETH of creator fees to the splitter's escrow balance
+        escrow.credit{value: 6.2 ether}(address(sp));
+        assertEq(escrow.balanceOf(address(sp)), 6.2 ether, "credited");
 
         sp.harvest(); // permissionless: pulls from escrow, then splits
 
         assertEq(escrow.balanceOf(address(sp)), 0, "escrow drained");
         assertEq(address(sp).balance, 0, "splitter drained");
-        assertEq(seat.balance + ops.balance + team.balance, 5.7 ether, "all forwarded");
-        assertApproxEqRel(seat.balance, 5 ether, 0.002e18);
+        assertEq(seat.balance + ops.balance + team.balance, 6.2 ether, "all forwarded");
+        assertApproxEqRel(seat.balance, 5.5 ether, 0.002e18);
     }
 
     // harvest also mops up ETH already sitting in the splitter (e.g. sent directly), not just escrow
