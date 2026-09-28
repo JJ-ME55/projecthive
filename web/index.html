@@ -133,6 +133,16 @@ footer .r{display:flex; gap:20px; flex-wrap:wrap; align-items:center}
 footer a{color:var(--muted)} footer a:hover{color:var(--ink)}
 footer .sp{flex:1}
 footer .fine{margin-top:18px; font-size:11.5px; line-height:1.6; max-width:780px; color:var(--faint)}
+
+/* contract-address bar + X icon */
+.cabar{flex-wrap:wrap}
+.cabar .v{font-size:12px; word-break:break-all; color:var(--ink)}
+.cabar a.v:hover{text-decoration:underline}
+.ca-copy{border:0; border-left:1px solid var(--line); background:var(--surface-2); color:var(--muted); font-family:inherit; font-size:11px; letter-spacing:.08em; text-transform:uppercase; padding:12px 14px; cursor:pointer}
+.ca-copy:hover{color:var(--ink)}
+.xico{display:inline-flex; align-items:center; color:var(--muted); padding:8px 8px}
+.xico svg{width:16px;height:16px;display:block}
+.xico:hover{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -146,6 +156,7 @@ footer .fine{margin-top:18px; font-size:11.5px; line-height:1.6; max-width:780px
     <span class="sp"></span>
     <a class="nlink" href="#how">How it works</a>
     <a class="nlink" href="#maths">The maths</a>
+    <a class="xico" href="https://x.com/HIVE_imd" target="_blank" rel="noopener noreferrer" aria-label="X (@HIVE_imd)" title="@HIVE_imd"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
     <a class="nbtn" href="/dashboard.html">Dashboard</a>
     <a class="nbtn solid" href="/stake.html">Stake</a>
   </div>
@@ -161,7 +172,7 @@ footer .fine{margin-top:18px; font-size:11.5px; line-height:1.6; max-width:780px
       <a class="btn solid" href="/dashboard.html">Dashboard</a>
       <a class="btn" href="#how">How it works</a>
     </div>
-    <div class="cabar"><span class="k">Contract</span><span class="v">Address goes live at launch on Pons.</span></div>
+    <div class="cabar" id="cabar"><span class="k">Contract</span><a class="v tnum" id="ca-val" target="_blank" rel="noopener noreferrer">loading…</a><button class="ca-copy" id="ca-copy" type="button">Copy</button></div>
   </div>
 </header>
 
@@ -242,14 +253,33 @@ footer .fine{margin-top:18px; font-size:11.5px; line-height:1.6; max-width:780px
         <img src="hive-logo.png" alt="" aria-hidden="true" style="height:17px;width:auto;display:block">HIVE
       </a>
       <span class="sp"></span>
-      <a href="/dashboard.html">Dashboard</a><a href="#how">How it works</a><a href="#maths">The maths</a>
+      <a href="/dashboard.html">Dashboard</a><a href="#how">How it works</a><a href="#maths">The maths</a><a href="https://x.com/HIVE_imd" target="_blank" rel="noopener noreferrer">X · @HIVE_imd</a>
     </div>
     <p class="fine">$HIVE turns trading fees into income-producing identity.md agent seats and pays stakers the IMD those seats earn. Not affiliated with identity.md or the IMD team. Not investment advice and not a promise of returns. Seat earnings depend on real demand for the swarm's work. DYOR.</p>
   </div>
 </footer>
 
+<script src="config.js"></script>
 <script>
   document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener("click",function(e){ var el=document.querySelector(a.getAttribute("href")); if(el){ e.preventDefault(); el.scrollIntoView({behavior:"smooth"}); } }); });
+
+  // contract address from config.js (single source of truth) — full address, copy button, explorer link
+  (function(){
+    var cfg = window.HIVE_CFG || {}, ca = cfg.hiveToken || "";
+    var el = document.getElementById("ca-val"), btn = document.getElementById("ca-copy");
+    if(!el) return;
+    if(/^0x[0-9a-fA-F]{40}$/.test(ca)){
+      el.textContent = ca;
+      el.href = (cfg.explorer || "https://robinhoodchain.blockscout.com") + "/token/" + ca;
+      if(btn) btn.addEventListener("click", function(){
+        try{ navigator.clipboard.writeText(ca).then(function(){ var t=btn.textContent; btn.textContent="Copied"; setTimeout(function(){ btn.textContent=t; }, 1200); }); }catch(e){}
+      });
+    } else {
+      el.removeAttribute("href");
+      el.textContent = "Live at launch on Pons.";
+      if(btn) btn.style.display = "none";
+    }
+  })();
 
   // live identity.md floor (OpenSea via /api/floor) — falls back to the static figure if unset
   (async function(){

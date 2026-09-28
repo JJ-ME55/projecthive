@@ -69,6 +69,15 @@ a{color:var(--ink);text-decoration:none}
 .tiers span{border:1px solid var(--soft); padding:4px 8px}
 .tiers span.on{border-color:var(--line); color:var(--ink); font-weight:600}
 
+/* ---- network: supply staked ---- */
+.supply{border:1px solid var(--line); padding:13px 15px; margin-bottom:16px}
+.supply-h{display:flex; align-items:baseline; justify-content:space-between}
+.supply-h .k{font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+.supply-h b{font-size:21px; font-weight:600}
+.supply-track{height:6px; background:var(--surface-2); border:1px solid var(--soft); margin-top:9px; overflow:hidden}
+.supply-fill{height:100%; background:var(--ink); width:0; transition:width .6s ease}
+.supply-sub{display:block; font-size:11px; color:var(--muted); margin-top:7px}
+
 /* ---- lure: why hold HIVE ---- */
 .lure{border:1px solid var(--line); margin-bottom:16px}
 .lure-h{display:flex; align-items:center; justify-content:space-between; padding:12px 15px; border-bottom:1px solid var(--soft)}
@@ -131,45 +140,12 @@ a{color:var(--ink);text-decoration:none}
 
   <div class="banner" id="banner"></div>
 
-  <!-- WHY HOLD HIVE — the lure -->
-  <section class="lure">
-    <div class="lure-h">
-      <h2>What your stake earns</h2>
-      <span class="live-dot" id="swarm-live">imd.fun</span>
-    </div>
-    <div class="swarm">
-      <div class="sm"><b class="tnum" id="sw-agents">—</b><span>agents online</span></div>
-      <div class="sm"><b class="tnum" id="sw-jobs">—</b><span>jobs done today</span></div>
-      <div class="sm"><b class="tnum" id="sw-seats">—</b><span>seats in the swarm</span></div>
-    </div>
-    <p class="lure-lede">A seat is a real AI worker that gets paid per job. One costs <b id="floor-usd">~$7,000</b>, and you have to run it yourself. Staking $HIVE pools the fees to buy and <b>run</b> seats for you — so you own a slice of a working fleet for any amount.</p>
-    <div class="calc">
-      <label for="calc-amt">If you staked</label>
-      <div class="calc-field"><span>$</span><input id="calc-amt" inputmode="numeric" value="8,000"></div>
-      <div class="pie" id="pie">Your slice of the pie goes live at launch — <b>early stakers own the most of the fewest seats</b>.</div>
-    </div>
-    <div class="vs">
-      <div class="vs-col win">
-        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in HIVE</span>
-        <ul>
-          <li><b>A slice of the fleet</b> — your share of every seat the Hive runs</li>
-          <li>Earns <b>labor income</b> — seats get paid to work (<span class="tnum" id="sw-jobs2">—</span> jobs today)</li>
-          <li>Plus the burn-trim, and it <b>compounds</b> — earnings buy more seats</li>
-        </ul>
-      </div>
-      <div class="vs-col">
-        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in IMD</span>
-        <ul>
-          <li>Buys <b>sIMD</b>, a share of the staking vault (~2.3M IMD staked)</li>
-          <li>Earns only the <b>4.5% burn-trim</b> — and only when holders sell</li>
-          <li><b>No labor income. No seat you can run.</b></li>
-        </ul>
-      </div>
-    </div>
-    <p class="simd-real"><span>sIMD's real, live rate:</span> <b id="simd-rate">~9%</b> <span>APR — read straight from the vault, not the <s>782,132%</s> imd.fun advertises.</span></p>
-    <p class="kicker">Same money. One runs a fleet of AI workers; the other waits for sell taxes.</p>
-    <p class="disclose">Projected — the Hive isn't running seats yet. The pie share and per-seat figures switch to live once it buys and runs seat&nbsp;#1. Rewards depend on real seat work and are not guaranteed.</p>
-  </section>
+  <!-- network: how much of supply is staked -->
+  <div class="supply">
+    <div class="supply-h"><span class="k">$HIVE supply staked</span><b class="tnum" id="supply-pct">—</b></div>
+    <div class="supply-track"><div class="supply-fill" id="supply-fill"></div></div>
+    <span class="supply-sub" id="supply-abs">—</span>
+  </div>
 
   <div class="pos">
     <div class="pc"><span class="k">Your stake</span><div class="v tnum" id="p-staked">—</div><div class="s">$HIVE</div></div>
@@ -207,6 +183,46 @@ a{color:var(--ink);text-decoration:none}
     </div>
     <div class="status" id="claim-status" style="padding:0 15px 14px"></div>
   </div>
+
+  <!-- WHY HOLD HIVE — the lure (below the staking dialog) -->
+  <section class="lure">
+    <div class="lure-h">
+      <h2>What your stake earns</h2>
+      <span class="live-dot" id="swarm-live">imd.fun</span>
+    </div>
+    <div class="swarm">
+      <div class="sm"><b class="tnum" id="sw-agents">—</b><span>agents online</span></div>
+      <div class="sm"><b class="tnum" id="sw-jobs">—</b><span>jobs done today</span></div>
+      <div class="sm"><b class="tnum" id="sw-seats">—</b><span>seats in the swarm</span></div>
+    </div>
+    <p class="lure-lede">A seat is a real AI worker that gets paid per job. One costs <b id="floor-usd">~$7,000</b>, and you have to run it yourself. Staking $HIVE pools the fees to buy and <b>run</b> seats for you — so you own a slice of a working fleet for any amount.</p>
+    <div class="calc">
+      <label for="calc-amt">If you staked</label>
+      <div class="calc-field"><span>$</span><input id="calc-amt" inputmode="numeric" value="8,000"></div>
+      <div class="pie" id="pie">Your slice of the pie goes live once seats are running — <b>early stakers own the most of the fewest seats</b>.</div>
+    </div>
+    <div class="vs">
+      <div class="vs-col win">
+        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in HIVE</span>
+        <ul>
+          <li><b>A slice of the fleet</b> — your share of every seat the Hive runs</li>
+          <li>Earns <b>labor income</b> — seats get paid to work (<span class="tnum" id="sw-jobs2">—</span> jobs today)</li>
+          <li>Plus the burn-trim, and it <b>compounds</b> — earnings buy more seats</li>
+        </ul>
+      </div>
+      <div class="vs-col">
+        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in IMD</span>
+        <ul>
+          <li>Buys <b>sIMD</b>, a share of the staking vault (~2.3M IMD staked)</li>
+          <li>Earns only the <b>4.5% burn-trim</b> — and only when holders sell</li>
+          <li><b>No labor income. No seat you can run.</b></li>
+        </ul>
+      </div>
+    </div>
+    <p class="simd-real"><span>sIMD's real, live rate:</span> <b id="simd-rate">~9%</b> <span>APR — read straight from the vault, not the <s>782,132%</s> imd.fun advertises.</span></p>
+    <p class="kicker">Same money. One runs a fleet of AI workers; the other waits for sell taxes.</p>
+    <p class="disclose">Projected — the Hive isn't running seats yet. The pie share and per-seat figures switch to live once it buys and runs seat&nbsp;#1. Rewards depend on real seat work and are not guaranteed.</p>
+  </section>
 
   <p class="note" id="note">Stake $HIVE, earn the IMD the seats produce. Your loyalty multiplier rises from 1.00× to 2.00× the longer you stay staked; it locks in a new tier whenever you stake, claim, or unstake. On Robinhood Chain. No admin keys — the contract can never take your stake.</p>
 </div>
@@ -300,6 +316,7 @@ async function refresh(){
   $("stake-btn").disabled=false; $("unstake-btn").disabled=false; $("claim-btn").disabled = pos.claimable===0n;
   updateStakeBtn();
   }catch(e){ $("stake-status").textContent = "Couldn't read your position — check network and retry."; }
+  loadSupplyStaked();
 }
 function updateStakeBtn(){
   const v = parseAmt($("stake-amt").value);
@@ -403,7 +420,25 @@ async function loadSimdRate(){
   }catch(e){}
 }
 
-loadSwarm(); loadFloorUsd(); loadSimdRate(); syncCalc();
+// % of $HIVE total supply currently staked (network stat — shown to everyone, connected or not)
+async function loadSupplyStaked(){
+  if(!live) return;
+  try{
+    const p = new ethers.JsonRpcProvider(CFG.rpc);
+    const stk = new ethers.Contract(CFG.hiveStaking, ["function totalStaked() view returns (uint256)"], p);
+    const tok = new ethers.Contract(CFG.hiveToken, ["function totalSupply() view returns (uint256)"], p);
+    const [ts, sup] = await Promise.all([stk.totalStaked(), tok.totalSupply()]);
+    if(sup > 0n){
+      const pct = Number((ts * 100000n) / sup) / 1000; // 3-dp %
+      $("supply-pct").textContent = pct.toFixed(2) + "%";
+      const f = n => Number(ethers.formatUnits(n, 18)).toLocaleString("en-US", { maximumFractionDigits: 0 });
+      $("supply-abs").textContent = f(ts) + " of " + f(sup) + " $HIVE staked";
+      if($("supply-fill")) $("supply-fill").style.width = Math.min(100, pct) + "%";
+    }
+  }catch(e){}
+}
+
+loadSwarm(); loadFloorUsd(); loadSimdRate(); loadSupplyStaked(); syncCalc();
 </script>
 </body>
 </html>
