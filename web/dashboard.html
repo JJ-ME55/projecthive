@@ -185,19 +185,17 @@ a{color:var(--ink);text-decoration:none}
   <p class="note" id="note">Read-only. Seat count and $IMD come from Ethereum; the pot from Robinhood Chain; the seat floor from OpenSea. Nothing here can move funds. The live figures switch on as the Hive deploys and buys its first seat.</p>
 </div>
 
+<script src="config.js"></script>
 <script>
-// ------- config (filled at launch; the dashboard reads what's set and switches on) -------
+// ------- config: single source of truth is config.js (window.HIVE_CFG); these are fallback defaults -------
 const CFG = {
-  seatVault:    "",  // Ethereum Safe that holds the seats
-  potWallet:    "",  // Robinhood seat-treasury (ETH pooling toward the next seat)
-  hiveStaking:  "",  // Robinhood HiveStaking
-  hiveToken:    "",  // Robinhood $HIVE
-  imdRobinhood: "",  // bridged IMD on Robinhood
+  seatVault: "", potWallet: "", hiveStaking: "", hiveToken: "", imdRobinhood: "",
   identityMd:   "0x0000eC93127BAA929E58E97dd0095A2BFb38ec1D",
   imdEth:       "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7"
 };
-const ETH_RPCS=["https://ethereum-rpc.publicnode.com","https://eth.llamarpc.com","https://rpc.ankr.com/eth"];
-const RH_RPCS=["https://rpc.mainnet.chain.robinhood.com","https://rpc.ordofi.network"];
+Object.assign(CFG, window.HIVE_CFG || {}); // wired at launch from one place, no per-page drift
+const ETH_RPCS = CFG.ethRpcs || ["https://ethereum-rpc.publicnode.com","https://eth.llamarpc.com","https://rpc.ankr.com/eth"];
+const RH_RPCS  = CFG.rhRpcs  || ["https://rpc.mainnet.chain.robinhood.com","https://rpc.ordofi.network"];
 const $=function(id){return document.getElementById(id);};
 const has=a=>/^0x[0-9a-fA-F]{40}$/.test(a||"");
 let ethUsd=0;
@@ -210,7 +208,7 @@ async function rpc(urls,method,params){
   return null;
 }
 const nativeBal=(urls,addr)=>rpc(urls,"eth_getBalance",[addr,"latest"]).then(x=>x?Number(BigInt(x))/1e18:null);
-async function erc(urls,token,addr){ const data="0x70a08231"+addr.toLowerCase().replace(/^0x/,"").padStart(64,"0"); const r=await rpc(urls,"eth_call",[{to:token,data},"latest"]); return r?Number(BigInt(r)):null; }
+async function erc(urls,token,addr){ if(!has(token)||!has(addr)) return null; const data="0x70a08231"+addr.toLowerCase().replace(/^0x/,"").padStart(64,"0"); const r=await rpc(urls,"eth_call",[{to:token,data},"latest"]); if(!r||r==="0x") return null; try{ return Number(BigInt(r)); }catch(e){ return null; } }
 
 async function loadPrice(){ try{ const r=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd").then(r=>r.json()); ethUsd=(r&&r.ethereum&&r.ethereum.usd)||0; }catch(e){} }
 
@@ -256,9 +254,18 @@ async function checkWallet(){
   if(!has(a)){ $("w-note").textContent="Enter a valid 0x wallet address."; return; }
   if(!has(CFG.hiveStaking)){ $("w-note").textContent="Staking isn't live yet — check back at launch."; return; }
   $("w-note").textContent="Reading on-chain…";
-  const staked=await erc(RH_RPCS,CFG.hiveStaking,a); // placeholder: stake balance getter wired at launch
-  $("w-staked").textContent = staked!=null? fmt(staked/1e18,0)+" HIVE" : "—";
-  $("w-note").textContent="Loyalty multiplier and claimable IMD load once the staking ABI is wired at launch.";
+  try{
+    // stakeOf(address) -> (amount, since, weight, multBps, claimable)
+    const data="0x42623360"+a.toLowerCase().replace(/^0x/,"").padStart(64,"0");
+    const r=await rpc(RH_RPCS,"eth_call",[{to:CFG.hiveStaking,data},"latest"]);
+    if(!r||r==="0x"||r.length<2+64*5){ $("w-staked").textContent="—"; $("w-mult").textContent="—"; $("w-pending").textContent="—"; $("w-note").textContent="No position found for that wallet."; return; }
+    const h=r.replace(/^0x/,""); const word=i=>BigInt("0x"+h.slice(i*64,i*64+64));
+    const amount=word(0), multBps=word(3), claimable=word(4);
+    $("w-staked").textContent = fmt(Number(amount)/1e18,0)+" HIVE";
+    $("w-mult").textContent = (Number(multBps)/10000).toFixed(2)+"×";
+    $("w-pending").textContent = fmt(Number(claimable)/1e18,4)+" IMD";
+    $("w-note").textContent = amount>0n ? "Live position, read straight from the staking contract." : "That wallet isn't staking yet.";
+  }catch(e){ $("w-staked").textContent="—"; $("w-mult").textContent="—"; $("w-pending").textContent="—"; $("w-note").textContent="Couldn't read that wallet — check the address and retry."; }
 }
 
 async function boot(){

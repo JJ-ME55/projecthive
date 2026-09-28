@@ -114,8 +114,10 @@ contract SeatBuyer is ReentrancyGuard, IERC721Receiver {
         emit SeatBought(tokenId, p.offerer, cost);
     }
 
-    /// return idle ETH to the vault (permissionless; the destination is fixed, so nothing can be stolen)
+    /// return idle ETH to the vault. Destination is fixed (nothing can be stolen); restricted to the
+    /// keeper or the vault so it can't be front-run to grief a pending buySeat by emptying the balance.
     function rescueEth() external nonReentrant {
+        if (msg.sender != keeper && msg.sender != seatVault) revert NotKeeper();
         uint256 bal = address(this).balance;
         if (bal == 0) return;
         (bool ok,) = payable(seatVault).call{value: bal}("");

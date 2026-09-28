@@ -172,16 +172,28 @@ contract HiveStaking is ReentrancyGuard {
     }
 
     /// deposit IMD to distribute across all stakers (the keeper calls this; anyone may top up)
-    function depositReward(uint256 amount) public {
-        if (amount != 0) rewardToken.safeTransferFrom(msg.sender, address(this), amount);
-        uint256 total = amount + rewardCarry;
+    function depositReward(uint256 amount) public nonReentrant {
+        // credit the ACTUAL amount received, not the nominal `amount`, so a fee-on-transfer or
+        // deflationary reward token can never record more liability than the contract holds
+        uint256 received = 0;
+        if (amount != 0) {
+            uint256 balBefore = rewardToken.balanceOf(address(this));
+            rewardToken.safeTransferFrom(msg.sender, address(this), amount);
+            received = rewardToken.balanceOf(address(this)) - balBefore;
+        }
+        uint256 total = received + rewardCarry;
         if (total == 0) return;
         if (totalWeight == 0) {
             rewardCarry = total; // nothing staked yet — hold it for the first stakers
             return;
         }
+        uint256 inc = (total * PRECISION) / totalWeight;
+        if (inc == 0) {
+            rewardCarry = total; // too small to distribute against the current weight — keep rolling, don't burn it
+            return;
+        }
         rewardCarry = 0;
-        accRewardPerWeight += (total * PRECISION) / totalWeight;
+        accRewardPerWeight += inc;
         emit RewardDeposited(msg.sender, total, accRewardPerWeight);
     }
 

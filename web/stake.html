@@ -68,7 +68,54 @@ a{color:var(--ink);text-decoration:none}
 .tiers{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; font-size:11px; color:var(--muted)}
 .tiers span{border:1px solid var(--soft); padding:4px 8px}
 .tiers span.on{border-color:var(--line); color:var(--ink); font-weight:600}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- lure: why hold HIVE ---- */
+.lure{border:1px solid var(--line); margin-bottom:16px}
+.lure-h{display:flex; align-items:center; justify-content:space-between; padding:12px 15px; border-bottom:1px solid var(--soft)}
+.lure-h h2{font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase}
+.live-dot{font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--faint); display:flex; align-items:center; gap:6px}
+.live-dot::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--faint)}
+.live-dot.on{color:var(--muted)}
+.live-dot.on::before{background:var(--ink); animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(58,112,67,.45)}70%{box-shadow:0 0 0 6px rgba(58,112,67,0)}100%{box-shadow:0 0 0 0 rgba(58,112,67,0)}}
+.swarm{display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid var(--soft)}
+.swarm .sm{padding:12px 6px; text-align:center; border-right:1px solid var(--soft)}
+.swarm .sm:last-child{border-right:0}
+.swarm .sm b{display:block; font-size:19px; font-weight:600}
+.swarm .sm span{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.lure-lede{padding:14px 15px; margin:0; font-size:12.5px; color:var(--muted); border-bottom:1px solid var(--soft)}
+.lure-lede b{color:var(--ink); font-weight:600}
+.calc{display:flex; align-items:center; gap:12px; padding:14px 15px; flex-wrap:wrap}
+.calc label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.calc-field{display:flex; align-items:center; border:1px solid var(--line); flex:1; min-width:150px; max-width:220px}
+.calc-field span{padding:0 2px 0 12px; color:var(--muted); font-size:16px}
+.calc-field input{flex:1; min-width:0; font-family:inherit; font-size:16px; background:transparent; border:0; color:var(--ink); padding:11px 12px 11px 4px}
+.calc-field input:focus{outline:0; background:var(--surface-2)}
+.pie{font-size:11.5px; color:var(--muted)}
+.pie b{color:var(--ink); font-weight:600}
+.vs{display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--soft)}
+.vs-col{padding:14px 15px; border-right:1px solid var(--soft)}
+.vs-col:last-child{border-right:0}
+.vs-col.win{background:var(--surface-2)}
+.vs-tag{display:block; font-size:11px; font-weight:600; letter-spacing:.03em; margin-bottom:10px; color:var(--muted)}
+.vs-col.win .vs-tag{color:var(--ink)}
+.vs-col ul{margin:0; padding-left:15px; font-size:12px; color:var(--muted); line-height:1.5}
+.vs-col li{margin-bottom:7px}
+.vs-col li:last-child{margin-bottom:0}
+.vs-col li b{color:var(--ink); font-weight:600}
+.simd-real{padding:11px 15px; margin:0; font-size:11.5px; color:var(--muted); border-top:1px solid var(--soft); display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; justify-content:center; text-align:center}
+.simd-real b{color:var(--ink); font-size:15px; font-weight:600}
+.simd-real s{color:var(--faint)}
+.kicker{padding:12px 15px; margin:0; font-size:12.5px; font-weight:600; color:var(--ink); border-top:1px solid var(--soft); text-align:center}
+.disclose{padding:0 15px 13px; margin:0; font-size:10.5px; color:var(--faint); line-height:1.5; text-align:center}
+@media (max-width:560px){
+  .swarm .sm{padding:11px 4px}
+  .swarm .sm b{font-size:17px}
+  .vs{grid-template-columns:1fr}
+  .vs-col{border-right:0;border-bottom:1px solid var(--soft)}
+  .vs-col:last-child{border-bottom:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important} .live-dot.on::before{animation:none!important}}
 </style>
 </head>
 <body>
@@ -83,6 +130,46 @@ a{color:var(--ink);text-decoration:none}
   </div>
 
   <div class="banner" id="banner"></div>
+
+  <!-- WHY HOLD HIVE — the lure -->
+  <section class="lure">
+    <div class="lure-h">
+      <h2>What your stake earns</h2>
+      <span class="live-dot" id="swarm-live">imd.fun</span>
+    </div>
+    <div class="swarm">
+      <div class="sm"><b class="tnum" id="sw-agents">—</b><span>agents online</span></div>
+      <div class="sm"><b class="tnum" id="sw-jobs">—</b><span>jobs done today</span></div>
+      <div class="sm"><b class="tnum" id="sw-seats">—</b><span>seats in the swarm</span></div>
+    </div>
+    <p class="lure-lede">A seat is a real AI worker that gets paid per job. One costs <b id="floor-usd">~$7,000</b>, and you have to run it yourself. Staking $HIVE pools the fees to buy and <b>run</b> seats for you — so you own a slice of a working fleet for any amount.</p>
+    <div class="calc">
+      <label for="calc-amt">If you staked</label>
+      <div class="calc-field"><span>$</span><input id="calc-amt" inputmode="numeric" value="8,000"></div>
+      <div class="pie" id="pie">Your slice of the pie goes live at launch — <b>early stakers own the most of the fewest seats</b>.</div>
+    </div>
+    <div class="vs">
+      <div class="vs-col win">
+        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in HIVE</span>
+        <ul>
+          <li><b>A slice of the fleet</b> — your share of every seat the Hive runs</li>
+          <li>Earns <b>labor income</b> — seats get paid to work (<span class="tnum" id="sw-jobs2">—</span> jobs today)</li>
+          <li>Plus the burn-trim, and it <b>compounds</b> — earnings buy more seats</li>
+        </ul>
+      </div>
+      <div class="vs-col">
+        <span class="vs-tag">$<span class="calc-echo">8,000</span> staked in IMD</span>
+        <ul>
+          <li>Buys <b>sIMD</b>, a share of the staking vault (~2.3M IMD staked)</li>
+          <li>Earns only the <b>4.5% burn-trim</b> — and only when holders sell</li>
+          <li><b>No labor income. No seat you can run.</b></li>
+        </ul>
+      </div>
+    </div>
+    <p class="simd-real"><span>sIMD's real, live rate:</span> <b id="simd-rate">~9%</b> <span>APR — read straight from the vault, not the <s>782,132%</s> imd.fun advertises.</span></p>
+    <p class="kicker">Same money. One runs a fleet of AI workers; the other waits for sell taxes.</p>
+    <p class="disclose">Projected — the Hive isn't running seats yet. The pie share and per-seat figures switch to live once it buys and runs seat&nbsp;#1. Rewards depend on real seat work and are not guaranteed.</p>
+  </section>
 
   <div class="pos">
     <div class="pc"><span class="k">Your stake</span><div class="v tnum" id="p-staked">—</div><div class="s">$HIVE</div></div>
@@ -124,16 +211,17 @@ a{color:var(--ink);text-decoration:none}
   <p class="note" id="note">Stake $HIVE, earn the IMD the seats produce. Your loyalty multiplier rises from 1.00× to 2.00× the longer you stay staked; it locks in a new tier whenever you stake, claim, or unstake. On Robinhood Chain. No admin keys — the contract can never take your stake.</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="ethers.umd.min.js"></script>
+<script src="config.js"></script>
 <script>
 const CFG = {
-  hiveStaking: "",  // Robinhood HiveStaking — set at launch
-  hiveToken:   "",  // Robinhood $HIVE — set at launch
+  hiveStaking: "", hiveToken: "",
   chainId: 4663, chainHex: "0x1237",
   rpc: "https://rpc.mainnet.chain.robinhood.com",
   explorer: "https://robinhoodchain.blockscout.com",
   chainName: "Robinhood Chain"
 };
+Object.assign(CFG, window.HIVE_CFG || {}); // single source of truth (config.js), wired at launch
 const STAKING_ABI = [
   "function stake(uint256 amount)",
   "function unstake(uint256 amount)",
@@ -147,12 +235,17 @@ const ERC20_ABI = [
   "function decimals() view returns (uint8)"
 ];
 const $=id=>document.getElementById(id);
-const live = /^0x[0-9a-fA-F]{40}$/.test(CFG.hiveStaking) && /^0x[0-9a-fA-F]{40}$/.test(CFG.hiveToken);
+// checksum-validate every address; a malformed one becomes "" so the page fails safe (stays gated, never signs against a bad address)
+const A = x => { try { return ethers.getAddress(x); } catch(e){ return ""; } };
+["hiveStaking","hiveToken","potWallet","splitter","imdRobinhood","seatVault"].forEach(k=>{ if(CFG[k]) CFG[k] = A(CFG[k]); });
+const live = !!(CFG.hiveStaking && CFG.hiveToken);
 let provider, signer, account, dec=18, allowance=0n, staked=0n, since=0;
 
 function fmt(x, d){ try{ return Number(ethers.formatUnits(x, d==null?dec:d)).toLocaleString("en-US",{maximumFractionDigits:4}); }catch(e){ return "0"; } }
 function short(a){ return a.slice(0,6)+"…"+a.slice(-4); }
 function tx(u){ return CFG.explorer+"/tx/"+u; }
+// render a tx link safely (no innerHTML): textContent label + href property + noopener
+function sent(el, hash){ el.textContent="Sent: "; const a=document.createElement("a"); a.href=tx(hash); a.target="_blank"; a.rel="noopener noreferrer"; a.textContent=short(hash); el.appendChild(a); }
 
 if(!live){
   $("banner").className="banner show";
@@ -187,6 +280,7 @@ async function refresh(){
   const hive = new ethers.Contract(CFG.hiveToken, ERC20_ABI, signer);
   const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
   try{ dec = Number(await hive.decimals()); }catch(e){}
+  try{
   const [bal, alw, pos] = await Promise.all([
     hive.balanceOf(account), hive.allowance(account, CFG.hiveStaking), stk.stakeOf(account)
   ]);
@@ -205,6 +299,7 @@ async function refresh(){
   }
   $("stake-btn").disabled=false; $("unstake-btn").disabled=false; $("claim-btn").disabled = pos.claimable===0n;
   updateStakeBtn();
+  }catch(e){ $("stake-status").textContent = "Couldn't read your position — check network and retry."; }
 }
 function updateStakeBtn(){
   const v = parseAmt($("stake-amt").value);
@@ -220,13 +315,13 @@ async function doStake(){
   const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
   try{
     if(v>allowance){
-      $("stake-status").textContent="Approving…";
+      $("stake-status").textContent="Approving unlimited $HIVE (one-time, so you never re-approve)…";
       const t=await hive.approve(CFG.hiveStaking, ethers.MaxUint256); await t.wait();
       allowance=ethers.MaxUint256; $("stake-btn").textContent="Stake";
-      $("stake-status").innerHTML='Approved. Now press Stake.'; return;
+      $("stake-status").textContent="Approved — now press Stake."; return;
     }
     $("stake-status").textContent="Staking…";
-    const t=await stk.stake(v); $("stake-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait();
+    const t=await stk.stake(v); sent($("stake-status"), t.hash); await t.wait();
     $("stake-status").textContent="Staked."; $("stake-amt").value=""; await refresh();
   }catch(e){ $("stake-status").textContent = (e && (e.shortMessage||e.message) || "Failed").slice(0,140); }
 }
@@ -235,13 +330,13 @@ async function doUnstake(){
   const v = parseAmt($("unstake-amt").value);
   if(v<=0n){ $("unstake-status").textContent="Enter an amount."; return; }
   const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
-  try{ $("unstake-status").textContent="Unstaking…"; const t=await stk.unstake(v); $("unstake-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait(); $("unstake-status").textContent="Unstaked."; $("unstake-amt").value=""; await refresh(); }
+  try{ $("unstake-status").textContent="Unstaking…"; const t=await stk.unstake(v); sent($("unstake-status"), t.hash); await t.wait(); $("unstake-status").textContent="Unstaked."; $("unstake-amt").value=""; await refresh(); }
   catch(e){ $("unstake-status").textContent=(e&&(e.shortMessage||e.message)||"Failed").slice(0,140); }
 }
 async function doClaim(){
   if(!signer){ return connect(); }
   const stk = new ethers.Contract(CFG.hiveStaking, STAKING_ABI, signer);
-  try{ $("claim-status").textContent="Claiming…"; const t=await stk.claim(); $("claim-status").innerHTML='Sent: <a target="_blank" href="'+tx(t.hash)+'">'+short(t.hash)+'</a>'; await t.wait(); $("claim-status").textContent="Claimed."; await refresh(); }
+  try{ $("claim-status").textContent="Claiming…"; const t=await stk.claim(); sent($("claim-status"), t.hash); await t.wait(); $("claim-status").textContent="Claimed."; await refresh(); }
   catch(e){ $("claim-status").textContent=(e&&(e.shortMessage||e.message)||"Failed").slice(0,140); }
 }
 
@@ -253,6 +348,62 @@ $("stake-amt").addEventListener("input", updateStakeBtn);
 $("stake-max").onclick=async()=>{ if(signer&&live){ const hive=new ethers.Contract(CFG.hiveToken,ERC20_ABI,signer); const b=await hive.balanceOf(account); $("stake-amt").value=ethers.formatUnits(b,dec); updateStakeBtn(); } };
 $("unstake-max").onclick=()=>{ $("unstake-amt").value=ethers.formatUnits(staked,dec); };
 if(!live){ ["stake-btn","unstake-btn","claim-btn"].forEach(id=>{ $(id).textContent="Opens at launch"; }); }
+
+// ---- lure: live swarm proof + live seat floor + the "% of the pie" calculator ----
+const nfmt = n => Number(n).toLocaleString("en-US");
+const parseUsd = s => { const n = parseFloat((s||"").replace(/[^0-9.]/g,"")); return isFinite(n)?n:0; };
+
+async function loadSwarm(){
+  try{
+    const r = await fetch("/imd/swarm").then(r=>r.json());
+    const h = (r && r.health) || {};
+    if(h.agentsOnline!=null) $("sw-agents").textContent = nfmt(h.agentsOnline);
+    if(h.jobsDoneLastDay!=null){ $("sw-jobs").textContent = nfmt(h.jobsDoneLastDay); $("sw-jobs2").textContent = nfmt(h.jobsDoneLastDay); }
+    if(h.seatsEnrolled!=null) $("sw-seats").textContent = nfmt(h.seatsEnrolled);
+    if(h.reachable){ $("swarm-live").className = "live-dot on"; $("swarm-live").textContent = "imd.fun · live"; }
+  }catch(e){}
+}
+
+async function loadFloorUsd(){
+  let floorEth = 0, ethUsd = 0;
+  try{ const f = await fetch("/api/floor").then(r=>r.json()); if(f && f.ok && f.floorEth) floorEth = Number(f.floorEth); }catch(e){}
+  try{ const p = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd").then(r=>r.json()); ethUsd = (p && p.ethereum && p.ethereum.usd) || 0; }catch(e){}
+  if(floorEth && ethUsd) $("floor-usd").textContent = "~$" + Math.round(floorEth*ethUsd).toLocaleString("en-US");
+  else if(floorEth) $("floor-usd").textContent = "~" + floorEth.toFixed(2) + " ETH";
+}
+
+function syncCalc(){
+  const v = parseUsd($("calc-amt").value);
+  const disp = v ? nfmt(v) : "0";
+  document.querySelectorAll(".calc-echo").forEach(e=>{ e.textContent = disp; });
+}
+$("calc-amt").addEventListener("input", syncCalc);
+$("calc-amt").addEventListener("blur", ()=>{ const v = parseUsd($("calc-amt").value); $("calc-amt").value = v ? nfmt(v) : ""; syncCalc(); });
+
+// sIMD real APR — the honest number, read from the verified ERC-4626 vault's share-price drift (NOT imd.fun's fake 782,132%)
+const SIMD = {
+  vault: "0x9efa934d9fad4ae28c998a40195646b965a97247", // "Staked IMD" (sIMD), verified on-chain 2026-09-27
+  rpc: "https://ethereum-rpc.publicnode.com",
+  base: 7.920973463093815356, // IMD per 1 sIMD, ~2026-09-20 (trailing baseline; the keeper refreshes /imd/simd.json post-launch)
+  baseMs: Date.UTC(2026, 8, 20)
+};
+async function loadSimdRate(){
+  try{
+    // prefer a keeper-written rolling snapshot when present; fall back to the pinned baseline
+    let base = SIMD.base, baseMs = SIMD.baseMs;
+    try{ const s = await fetch("/imd/simd.json").then(r=>r.ok?r.json():null); if(s && s.assets>0 && s.ms>0){ base = s.assets; baseMs = s.ms; } }catch(e){}
+    const p = new ethers.JsonRpcProvider(SIMD.rpc);
+    const v = new ethers.Contract(SIMD.vault, ["function convertToAssets(uint256) view returns (uint256)", "function decimals() view returns (uint8)"], p);
+    const sdec = Number(await v.decimals());       // sIMD share decimals (24) — read it, don't assume 18
+    const oneShare = 10n ** BigInt(sdec);          // 1 whole sIMD in base units
+    const nowAssets = Number(ethers.formatUnits(await v.convertToAssets(oneShare), 18)); // IMD (18-dec) per 1 sIMD
+    const days = Math.max(1, (Date.now() - baseMs) / 86400000);
+    const apr = (Math.pow(nowAssets / base, 365 / days) - 1) * 100;
+    if(isFinite(apr) && apr > 0 && apr < 1000) $("simd-rate").textContent = "~" + apr.toFixed(1) + "%";
+  }catch(e){}
+}
+
+loadSwarm(); loadFloorUsd(); loadSimdRate(); syncCalc();
 </script>
 </body>
 </html>

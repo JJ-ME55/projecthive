@@ -11,17 +11,22 @@
  */
 import path from "node:path";
 import { getAddress, type Address, type Hex } from "viem";
-import { log } from "./util.js";
+import { log, warn } from "./util.js";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as Address;
 
 function envAddr(name: string, fallback?: Address): Address {
   const raw = (process.env[name] ?? "").trim();
-  if (!raw) {
-    if (fallback) return fallback;
-    return ZERO; // unset launch address; guarded at the point of use
+  if (!raw) return fallback ?? ZERO; // unset launch address; guarded at the point of use
+  try {
+    return getAddress(raw); // validate the checksum
+  } catch {
+    // a bad paste must NOT crash the whole process at import (pm2 crash-loop). If there's a built-in
+    // default, keep it (a malformed override shouldn't discard a known-good address); else UNSET, which
+    // the per-lane readiness check / requireAddrs reports clearly before that lane runs.
+    warn(`${name} is not a valid checksummed address — ${fallback ? "using the built-in default" : "treating as UNSET"}; fix the env value`);
+    return fallback ?? ZERO;
   }
-  return getAddress(raw); // throws on a bad checksum — better to fail at startup
 }
 
 function envList(name: string, fallback: string[]): string[] {
@@ -101,6 +106,11 @@ export const POLICY = {
   gasMultBps: envNum("GAS_MULT_BPS", 13000), // 1.3x
   /** Slippage tolerance on a bridge quote, in bps. */
   bridgeSlippageBps: envNum("BRIDGE_SLIPPAGE_BPS", 100), // 1%
+  /** Abort a same-asset bridge if the destination would receive less than input × (1 - this), in bps.
+   *  Backstops a hostile/misquoted Relay response: a same-asset bridge should never lose this much. */
+  maxBridgeLossBps: envNum("MAX_BRIDGE_LOSS_BPS", 500), // 5%
+  /** Max native ETH value the keeper will attach to an ERC-20 (IMD) bridge's origin txs (a bridge fee). */
+  maxErc20BridgeNativeWei: envBig("MAX_ERC20_BRIDGE_NATIVE_WEI", 20000000000000000n), // 0.02 ETH
 } as const;
 
 // ---------------------------------------------------------------- integrations

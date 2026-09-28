@@ -146,7 +146,9 @@ export async function buyCheapestSeat(maxPayWei = POLICY.maxSeatPriceWei): Promi
       return null;
     }
     log(`[seats] buying seat #${order.offerIdentifier} for ${fmt(v.cost)} ETH from ${order.offerer}`);
-    const data = encodeFunctionData({ abi: seatBuyerAbi, functionName: "buySeat", args: [order as any, maxPayWei] });
+    // F3: cap the on-chain maxPay at the VALIDATED cost, not the blanket policy cap, so a hostile
+    // fulfillment_data response can never make us pay up to 2.5 ETH for a "cheap" seat.
+    const data = encodeFunctionData({ abi: seatBuyerAbi, functionName: "buySeat", args: [order as any, v.cost] });
     const res = await eth.send({ to: ADDR.seatBuyer, data, label: `SeatBuyer.buySeat #${order.offerIdentifier}` }, { abi: seatBuyerAbi });
     log(`[seats] bought: ${eth.explorerTx(res.hash)} (gas ${res.gasUsed})`);
     return { hash: res.hash, tokenId: order.offerIdentifier, cost: v.cost };

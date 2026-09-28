@@ -115,12 +115,19 @@ export function minAcceptable(expectedOutWei: bigint): bigint {
 }
 
 /** Send every step tx of a quote on the origin chain (in order) and return their hashes. */
-export async function executeBridge(quote: BridgeQuote): Promise<{ hashes: string[]; requestId?: string }> {
-  const { robinhood, ethereum } = await import("./clients.js");
+export async function executeBridge(quote: BridgeQuote, opts: { maxTotalValueWei: bigint }): Promise<{ hashes: string[]; requestId?: string }> {
+  const { robinhoodSigner, ethereumSigner } = await import("./clients.js");
+  // F2 backstop: the native value summed across every step can never exceed what we intended to move.
+  // This bounds the loss from a hostile/hijacked Relay response (wrong `to`, inflated `value`) to the cap,
+  // since the signer here has no on-chain guard like the SeatBuyer does.
+  const totalValue = quote.steps.reduce((a, s) => a + s.value, 0n);
+  if (totalValue > opts.maxTotalValueWei) {
+    throw new Error(`bridge aborted: quote asks to send ${fmt(totalValue)} native, cap is ${fmt(opts.maxTotalValueWei)} — refusing (possible hostile/misquoted route)`);
+  }
   const hashes: string[] = [];
   for (const [i, step] of quote.steps.entries()) {
-    // pick the signer for the step's chain (Relay always sends the origin-chain txs)
-    const chain = step.chainId === ROBINHOOD_ID() ? robinhood() : step.chainId === ETHEREUM_ID() ? ethereum() : null;
+    // sign with the hot wallet for the step's chain (Relay always sends the origin-chain txs)
+    const chain = step.chainId === ROBINHOOD_ID() ? robinhoodSigner() : step.chainId === ETHEREUM_ID() ? ethereumSigner() : null;
     if (!chain) throw new Error(`bridge step ${i} targets unknown chain ${step.chainId}`);
     if (!chain.wallet) throw new Error(`no signer for chain ${step.chainId}`);
     const res = await chain.send({ to: step.to, data: step.data, value: step.value, label: `bridge step ${i + 1}/${quote.steps.length}` });
@@ -128,6 +135,14 @@ export async function executeBridge(quote: BridgeQuote): Promise<{ hashes: strin
     log(`[bridge] step ${i + 1} sent: ${chain.explorerTx(res.hash)}`);
   }
   return { hashes, requestId: quote.requestId };
+}
+
+/** F2: reject a same-asset bridge quote that loses more than the allowed fraction, or returns no output. */
+function assertQuoteSane(quote: BridgeQuote, amountInWei: bigint, maxLossBps: number): void {
+  const floor = (amountInWei * BigInt(10_000 - maxLossBps)) / 10_000n;
+  if (quote.expectedOutWei < floor) {
+    throw new Error(`bridge aborted: quoted output ${fmt(quote.expectedOutWei)} < floor ${fmt(floor)} (> ${maxLossBps / 100}% loss on a same-asset bridge — refusing)`);
+  }
 }
 
 function ROBINHOOD_ID(): number {
@@ -145,7 +160,8 @@ export async function bridgeEthToEthereum(amountWei: bigint): Promise<{ hashes: 
   const recipient = ADDR.seatBuyer; // ETH lands directly in the buyer, ready to fill a listing
   const quote = await quoteBridge({ originChainId: ROBINHOOD.chainId, destChainId: ETHEREUM.chainId, originCurrency: NATIVE, destCurrency: NATIVE, amountWei, user: keeper, recipient });
   log(`[bridge] ${fmt(amountWei)} ETH RH -> ~${fmt(quote.expectedOutWei)} ETH on Ethereum -> SeatBuyer`);
-  const sent = await executeBridge(quote);
+  assertQuoteSane(quote, amountWei, POLICY.maxBridgeLossBps);
+  const sent = await executeBridge(quote, { maxTotalValueWei: amountWei }); // native bridge: send at most what we're bridging
   const status = sent.requestId ? await waitBridge(sent.requestId) : "timeout";
   return { hashes: sent.hashes, expectedOutWei: quote.expectedOutWei, landed: status === "success" };
 }
@@ -157,7 +173,8 @@ export async function bridgeImdToRobinhood(amountWei: bigint): Promise<{ hashes:
   const keeperEth = ethereumSigner().address;
   const quote = await quoteBridge({ originChainId: ETHEREUM.chainId, destChainId: ROBINHOOD.chainId, originCurrency: ADDR.imd, destCurrency: ADDR.imdRobinhood, amountWei, user: keeperEth, recipient: keeperEth });
   log(`[bridge] ${fmt(amountWei)} IMD Ethereum -> ~${fmt(quote.expectedOutWei)} IMD on RH -> keeper`);
-  const sent = await executeBridge(quote);
+  assertQuoteSane(quote, amountWei, POLICY.maxBridgeLossBps);
+  const sent = await executeBridge(quote, { maxTotalValueWei: POLICY.maxErc20BridgeNativeWei }); // ERC-20 bridge: only a small native fee allowed
   const status = sent.requestId ? await waitBridge(sent.requestId) : "timeout";
   return { hashes: sent.hashes, expectedOutWei: quote.expectedOutWei, landed: status === "success" };
 }

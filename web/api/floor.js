@@ -10,9 +10,12 @@ export default async function handler(req, res) {
     return;
   }
   try {
-    const r = await fetch(`https://api.opensea.io/api/v2/collections/${slug}/stats`, {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000); // never hang to the function limit
+    const r = await fetch(`https://api.opensea.io/api/v2/collections/${encodeURIComponent(slug)}/stats`, {
       headers: { "x-api-key": key, accept: "application/json" },
-    });
+      signal: ctrl.signal,
+    }).finally(() => clearTimeout(timer));
     if (!r.ok) {
       res.status(200).json({ ok: false, reason: `opensea ${r.status}` });
       return;
@@ -21,6 +24,6 @@ export default async function handler(req, res) {
     const floorEth = j?.total?.floor_price ?? null;
     res.status(200).json({ ok: floorEth != null, floorEth });
   } catch (e) {
-    res.status(200).json({ ok: false, reason: String(e?.message || e).slice(0, 120) });
+    res.status(200).json({ ok: false, reason: "floor unavailable" });
   }
 }

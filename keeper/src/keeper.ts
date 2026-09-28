@@ -22,15 +22,30 @@ import { bridgeEarningsBackOnce, readEarnings } from "./earnings.js";
 import { depositRewardOnce } from "./reward.js";
 import * as ledger from "./ledger.js";
 import { fmt, log, sleep, warn } from "./util.js";
+import { acquireLock, readiness } from "./boot.js";
 
-/** Run one lane, catching + recording any error so the loop continues. Returns true if it did work. */
+/** POST a one-line alert to ALERT_WEBHOOK (Discord/Slack/generic) when set. Never throws. */
+async function alert(text: string): Promise<void> {
+  const url = (process.env.ALERT_WEBHOOK ?? "").trim();
+  if (!url) return;
+  try {
+    await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ content: text, text }) });
+  } catch {}
+}
+
+const consecutiveFails: Record<string, number> = {};
+
+/** Run one lane, catching + recording any error so the loop continues. Alerts after repeated failures. */
 async function lane(l: ledger.Ledger, name: ledger.LedgerEvent["lane"], fn: () => Promise<unknown>): Promise<void> {
   try {
     await fn();
+    consecutiveFails[name] = 0;
   } catch (e) {
     const msg = String((e as Error)?.message ?? e).slice(0, 240);
     warn(`[${name}] error: ${msg}`);
     ledger.record(l, { lane: name, detail: `error: ${msg}` });
+    consecutiveFails[name] = (consecutiveFails[name] ?? 0) + 1;
+    if (consecutiveFails[name] === 3) void alert(`[hive-keeper] lane "${name}" failed 3× in a row: ${msg}`);
   }
 }
 
@@ -95,7 +110,9 @@ export async function status(): Promise<void> {
 
 export async function main(): Promise<void> {
   log("hive-keeper starting");
+  acquireLock();
   printConfig();
+  await readiness();
   const l = ledger.load();
   for (;;) {
     const t0 = Date.now();
